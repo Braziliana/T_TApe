@@ -66,40 +66,40 @@ public:
             ImGui::Checkbox("Enabled", &_enabled);
             ImGui::Checkbox("Rage", &_rage);
 
-            ImGui::SliderFloat("Vertical Power", &_verticalPower, 0.0f, 1.0f);
+            ImGui::SliderFloat("Vertical Power##Aimbot", &_verticalPower, 0.0f, 1.0f);
             ImGui::SameLine();
             ImGui::PushItemWidth(100); 
-            ImGui::InputFloat("", &_verticalPower, 0.01f, 0.1f);
+            ImGui::InputFloat("##AimbotVertical Power1", &_verticalPower, 0.01f, 0.1f);
             ImGui::PopItemWidth(); 
 
-            ImGui::SliderFloat("Horizontal Power", &_horizontalPower, 0.0f, 1.0f);
+            ImGui::SliderFloat("Horizontal Power##Aimbot", &_horizontalPower, 0.0f, 1.0f);
             ImGui::SameLine();
             ImGui::PushItemWidth(100); 
-            ImGui::InputFloat("", &_horizontalPower, 0.01f, 0.1f);
+            ImGui::InputFloat("##AimbotHorizontal Power1", &_horizontalPower, 0.01f, 0.1f);
             ImGui::PopItemWidth(); 
 
-            ImGui::SliderFloat("Speed", &_speed, 0.0f, 100.0f);
+            ImGui::SliderFloat("Speed##Aimbot", &_speed, 0.0f, 100.0f);
             ImGui::SameLine();
             ImGui::PushItemWidth(100); 
-            ImGui::InputFloat("", &_speed, 0.01f, 0.1f);
+            ImGui::InputFloat("##AimbotSpeed1", &_speed, 0.25f, 0.1f);
             ImGui::PopItemWidth(); 
 
-            ImGui::SliderFloat("Max Angle Change Per Tick", &_maxAngleChangePerTick, 0.0f, 50.0f);
+            ImGui::SliderFloat("Max Angle Change Per Tick##Aimbot", &_maxAngleChangePerTick, 0.0f, 50.0f);
             ImGui::SameLine();
             ImGui::PushItemWidth(100); 
-            ImGui::InputFloat("", &_maxAngleChangePerTick, 0.5f, 2.5f);
+            ImGui::InputFloat("##AimbotMax Angle Change Per Tick", &_maxAngleChangePerTick, 0.25f, 2.5f);
             ImGui::PopItemWidth(); 
 
-            ImGui::SliderFloat("Range In Meters", &_rangeInMeters, 0.0f, 1000.0f);
+            ImGui::SliderFloat("Range In Meters##Aimbot", &_rangeInMeters, 0.0f, 1000.0f);
             ImGui::SameLine();
             ImGui::PushItemWidth(100); 
-            ImGui::InputFloat("", &_rangeInMeters, 1.0f, 10.0f);
+            ImGui::InputFloat("##Aimbot Range In Meters 1", &_rangeInMeters, 1.0f, 10.0f);
             ImGui::PopItemWidth(); 
 
-            ImGui::SliderInt("Hitbox", &_hitbox, 0, 5);
+            ImGui::SliderInt("Hitbox##Aimbot", &_hitbox, 0, 5);
             ImGui::SameLine();
             ImGui::PushItemWidth(100); 
-            ImGui::InputInt("", &_hitbox, 0.01f, 0.1f);
+            ImGui::InputInt("##Aimbot Hitbox 1", &_hitbox, 0.01f, 0.1f);
             ImGui::PopItemWidth(); 
 
             ImGui::EndTabItem();

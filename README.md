@@ -4,8 +4,9 @@
 **Disclaimer: This code is for educational purposes only. It is not intended for use in any games or competitions where it may violate the terms and conditions or be considered unfair to other players. Please use this code responsibly and at your own risk.**
 
 <br />
+<br />
 
-<br />## 1. Install Cinnamon desktop environment on Ubuntu
+## 1. Install Cinnamon desktop environment on Ubuntu
 ```bash
 sudo apt update
 ```

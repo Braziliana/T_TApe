@@ -35,16 +35,16 @@ public:
 
             ImGui::Checkbox("Enabled", &_enabled);
 
-            ImGui::SliderFloat("Vertical Power", &_verticalPower, 0.0f, 1.0f, "%.2f");
+            ImGui::SliderFloat("Vertical Power##RCS", &_verticalPower, 0.0f, 1.0f, "%.2f");
             ImGui::SameLine();
             ImGui::PushItemWidth(100); 
-            ImGui::InputFloat("", &_verticalPower, 0.01f, 0.1f);
+            ImGui::InputFloat("##RCS Vertical Power1", &_verticalPower, 0.01f, 0.1f);
             ImGui::PopItemWidth(); 
 
-            ImGui::SliderFloat("Horizontal Power", &_horizontalPower, 0.0f, 1.0f, "%.2f");
+            ImGui::SliderFloat("Horizontal Power##RCS", &_horizontalPower, 0.0f, 1.0f, "%.2f");
             ImGui::SameLine();
             ImGui::PushItemWidth(100); 
-            ImGui::InputFloat("", &_horizontalPower, 0.01f, 0.1f);
+            ImGui::InputFloat("##RCS Horizontal Power 1", &_horizontalPower, 0.01f, 0.1f);
             ImGui::PopItemWidth(); 
 
             ImGui::EndTabItem();

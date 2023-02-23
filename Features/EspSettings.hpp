@@ -39,7 +39,7 @@ public:
             ImGui::SliderFloat("Glow range in meters", &_glowRangeInMeters, 50.0f, 10000.0f, "%.2f");
             ImGui::SameLine();
             ImGui::PushItemWidth(100); 
-            ImGui::InputFloat("", &_glowRangeInMeters, 1.0f, 10.0f);
+            ImGui::InputFloat("##Glow range in meters1", &_glowRangeInMeters, 1.0f, 10.0f);
             ImGui::PopItemWidth(); 
 
 
@@ -47,7 +47,7 @@ public:
             ImGui::SliderFloat("Hitbox range in meters", &_hitboxRangeInMeters, 5.0f, 500.0f, "%.2f");
             ImGui::SameLine();
             ImGui::PushItemWidth(100); 
-            ImGui::InputFloat("", &_hitboxRangeInMeters, 1.0f, 10.0f);
+            ImGui::InputFloat("##Hitbox range in meters1", &_hitboxRangeInMeters, 1.0f, 10.0f);
             ImGui::PopItemWidth(); 
 
 
