@@ -106,22 +106,22 @@ public:
         T buffer;
         bool success = read(address, &buffer, size);
 
-        if (!success)
+        if (!success) {
             throw new std::invalid_argument(concatenateStrings("Failed to read ", typeid(T).name(), " at address: ", convertPointerToHexString(address)));
-
+        }
+        
         return buffer;
     }
 
     template<typename T>
-    T write(ulong address, T& buffer)
+    void write(ulong address, T& buffer)
     {
         int size = sizeof(T);
         bool success = write(address, &buffer, size);
 
-        if (!success)
+        if (!success) {
             throw new std::invalid_argument(concatenateStrings("Failed to write ", typeid(T).name(), " at address: ", convertPointerToHexString(address)));
-
-        return buffer;
+        }
     }
 
     std::string readString(ulong address, int length) {

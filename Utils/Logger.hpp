@@ -20,6 +20,14 @@ public:
         std::cout << msg << std::endl;
     }    
     
+    static void logError(std::string msg) {
+        logError(msg.c_str());
+    }
+
+    static void logError(const char* msg) {
+        std::cerr << msg << std::endl;
+    }    
+
     static void log(const char* msg, float x, float y, float z) {
         std::cout << msg << "x: " << x << ",y: " << y << ", z: " << z << std::endl;
     }

@@ -6,6 +6,15 @@
 #include "Vector2d.hpp"
 #include "Vector3d.hpp"
 
+enum class AngleSmoothType {
+    LinearSmoothing,
+    ExponentialSmoothing,
+    SCurveSmoothing,
+    BezierSmoothing,
+    AccelerationSmoothing,
+    JerkLimitedSmoothing
+};
+
 struct QAngle {
 
     float x;
@@ -15,51 +24,61 @@ struct QAngle {
 
     QAngle(float x, float y) : x(x), y(y) {}
 
-    QAngle operator+(const QAngle& other) const {
+    inline QAngle operator+(const QAngle& other) const {
         return QAngle(x + other.x, y + other.y);
     }
 
-    QAngle operator-(const QAngle& other) const {
+    inline QAngle operator-(const QAngle& other) const {
         return QAngle(x - other.x, y - other.y);
     }
 
-    QAngle operator*(const float scalar) const {
+    inline QAngle operator*(const float scalar) const {
         return QAngle(x * scalar, y * scalar);
     }
 
-    QAngle operator/(const float scalar) const {
+    inline QAngle operator/(const float scalar) const {
         return QAngle(x / scalar, y / scalar);
     }
 
-    QAngle& operator+=(const QAngle& other) {
+    inline QAngle& operator+=(const QAngle& other) {
         x += other.x;
         y += other.y;
         return *this;
     }
 
-    QAngle& operator-=(const QAngle& other) {
+    inline QAngle& operator-=(const QAngle& other) {
         x -= other.x;
         y -= other.y;
         return *this;
     }
 
-    QAngle& operator*=(const float scalar) {
+    inline QAngle& operator*=(const float scalar) {
         x *= scalar;
         y *= scalar;
         return *this;
     }
 
-    QAngle& operator/=(const float scalar) {
+    inline QAngle& operator/=(const float scalar) {
         x /= scalar;
         y /= scalar;
         return *this;
     }
 
-    float dot(const QAngle& other) const {
+    inline bool operator==(const QAngle& other) const
+    {
+        return x == other.x && y == other.y;
+    }
+
+    inline bool operator!=(const QAngle& other) const
+    {
+        return !(*this == other);
+    }
+
+    inline float dot(const QAngle& other) const {
         return x * other.x + y * other.y;
     }
 
-    float length() const {
+    inline float length() const {
         return std::sqrt(x * x + y * y);
     }
 
@@ -67,7 +86,7 @@ struct QAngle {
         return (other - *this).length();
     };
 
-    QAngle& normalize() {
+    inline QAngle& normalize() {
         float len = length();
         if (len > 0) {
             x /= len;
@@ -76,7 +95,7 @@ struct QAngle {
         return *this;
     }
 
-    QAngle& clamp(float minVal, float maxVal) {
+    inline QAngle& clamp(float minVal, float maxVal) {
         x = std::clamp(x, minVal, maxVal);
         y = std::clamp(y, minVal, maxVal);
 
@@ -106,13 +125,22 @@ struct QAngle {
     QAngle lookAt(const Vector3d& from, const Vector3d& target, float t) const {
         QAngle targetAngle = lookAt(from, target);
 
+        if(!targetAngle.isValid()) {
+            return targetAngle;
+        }
+
         t = std::clamp(t, 0.0f, 1.0f);
         return lerp(targetAngle, t);
     }
 
     QAngle lookAt(const Vector3d& from, const Vector3d& target, float t, float maxAngleChange, float verticalChange = 1.0f, float horizontalChange = 1.0f) const {
-        QAngle desiredAngle = lookAt(from, target, t);
-        QAngle angleChange = desiredAngle - *this;
+        QAngle targetAngle = lookAt(from, target, t);
+        
+        if(!targetAngle.isValid()) {
+            return targetAngle;
+        }
+
+        QAngle angleChange = targetAngle - *this;
         angleChange = angleChange.clamp(-maxAngleChange, maxAngleChange);
         
         angleChange.x *= verticalChange; 
@@ -121,11 +149,64 @@ struct QAngle {
         return *this + angleChange;
     }
 
-    QAngle lerp(const QAngle& other, float t) const {
-        return (*this) * (1 - t) + other * t;
+    static QAngle LinearSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
+        return currentAngle + (targetAngle - currentAngle) * smoothingFactor;
     }
 
-    QAngle& fixAngle() {
+    static QAngle ExponentialSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
+        return targetAngle * smoothingFactor + currentAngle * (1 - smoothingFactor);
+    }
+
+    static QAngle SCurveSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
+        float factor = smoothingFactor * smoothingFactor * (3 - 2 * smoothingFactor);
+
+        return targetAngle * factor + currentAngle * (1 - factor);
+    }
+
+    static QAngle BezierSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
+        const float distanceToTarget = currentAngle.distanceTo(targetAngle);
+        const float t = 1.0f - pow(smoothingFactor, distanceToTarget);
+        const float smoothness = 0.5f;
+
+        const QAngle midAngle = (currentAngle + targetAngle) * 0.5f;
+        const QAngle controlPoint = (midAngle - currentAngle) * smoothness + currentAngle;
+        
+        return currentAngle * ((1 - t) * (1 - t)) + controlPoint * 2 * (1 - t) * t + targetAngle * (t * t);
+    }
+
+    static QAngle AccelerationSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float deltaTime, const float maxAcceleration) {
+        const float maxDeltaAngle = maxAcceleration * deltaTime;
+        const QAngle deltaAngle = targetAngle - currentAngle;
+        const float deltaAngleMagnitude = deltaAngle.length();
+
+        if (deltaAngleMagnitude <= maxDeltaAngle) {
+            return targetAngle;
+        }
+
+        const QAngle deltaAngleNormalized = deltaAngle / deltaAngleMagnitude;
+
+        return currentAngle + deltaAngleNormalized * maxDeltaAngle;
+    }
+
+    static QAngle jerkLimitedSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float deltaTime, const float maxJerk) {
+        const float maxDeltaAngle = 0.5f * maxJerk * deltaTime * deltaTime;
+        const QAngle deltaAngle = targetAngle - currentAngle;
+        const float deltaAngleMagnitude = deltaAngle.length();
+        
+        if (deltaAngleMagnitude <= maxDeltaAngle) {
+            return targetAngle;
+        }
+
+        const QAngle deltaAngleNormalized = deltaAngle / deltaAngleMagnitude;
+
+        return currentAngle + deltaAngleNormalized * maxDeltaAngle;
+    }
+
+    inline QAngle lerp(const QAngle& other, float t) const {
+        return (*this) * (1.0f - t) + other * t;
+    }
+
+    inline QAngle& fixAngle() {
 
         while (x > 89.0f)
             x -= 180.f;
@@ -142,7 +223,7 @@ struct QAngle {
         return *this;
     }
 
-    bool isValid() {
+    inline bool isValid() {
         if(std::isnan(x) || std::isinf(x) || std::isnan(y) || std::isinf(y)) {
             return false;
         }
@@ -150,7 +231,7 @@ struct QAngle {
         return true;
     }
 
-    static QAngle zero() {
+    inline static QAngle zero() {
         return QAngle(0, 0);
     }
 };

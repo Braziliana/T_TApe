@@ -1,9 +1,15 @@
 #pragma once
 #include "../imgui/imgui.h"
+#include "../Utils/SettingsContext.hpp"
+#include "../RenderEngine/Renderer.hpp"
 
 struct RcsSettings
 {
 private:
+    static const std::string enabledId;
+    static const std::string verticalPowerId;
+    static const std::string horizontalPowerId;
+
     bool _enabled;
     float _verticalPower;
     float _horizontalPower;
@@ -33,21 +39,28 @@ public:
     void render() {
         if(ImGui::BeginTabItem("RCS Settings")) {
 
-            ImGui::Checkbox("Enabled", &_enabled);
+            ImGui::Checkbox("Enabled##RCS", &_enabled);
 
-            ImGui::SliderFloat("Vertical Power##RCS", &_verticalPower, 0.0f, 1.0f, "%.2f");
-            ImGui::SameLine();
-            ImGui::PushItemWidth(100); 
-            ImGui::InputFloat("##RCS Vertical Power1", &_verticalPower, 0.01f, 0.1f);
-            ImGui::PopItemWidth(); 
-
-            ImGui::SliderFloat("Horizontal Power##RCS", &_horizontalPower, 0.0f, 1.0f, "%.2f");
-            ImGui::SameLine();
-            ImGui::PushItemWidth(100); 
-            ImGui::InputFloat("##RCS Horizontal Power 1", &_horizontalPower, 0.01f, 0.1f);
-            ImGui::PopItemWidth(); 
+            Renderer::renderImguiFloatValue("Vertical power", "RCS", &_verticalPower, 0.0f, 1.0f, 0.01f, 0.1f);
+            Renderer::renderImguiFloatValue("Horizontal power", "RCS", &_horizontalPower, 0.0f, 1.0f, 0.01f, 0.1f);
 
             ImGui::EndTabItem();
         }
     }
+
+    void load(const SettingsContext& settingsContext) {
+        _enabled = settingsContext.loadBool(enabledId);
+        _verticalPower = settingsContext.loadFloat(verticalPowerId);
+        _horizontalPower = settingsContext.loadFloat(horizontalPowerId);
+    }
+
+    void save(SettingsContext& settingsContext) const {
+        settingsContext.set(enabledId, _enabled);
+        settingsContext.set(verticalPowerId, _verticalPower);
+        settingsContext.set(horizontalPowerId, _horizontalPower);
+    }
 };
+
+const std::string RcsSettings::enabledId = "rcs.enabled";
+const std::string RcsSettings::verticalPowerId = "rcs.verticalPower";
+const std::string RcsSettings::horizontalPowerId = "rcs.horizontalPower";

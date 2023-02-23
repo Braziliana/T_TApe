@@ -1,9 +1,20 @@
 #pragma once
 #include "../imgui/imgui.h"
+#include "../Utils/SettingsContext.hpp"
+#include "../RenderEngine/Renderer.hpp"
 
 struct AimbotSettings
 {
 private:
+    static const std::string enabledId;
+    static const std::string rageId;
+    static const std::string verticalPowerId;
+    static const std::string horizontalPowerId;
+    static const std::string speedId;
+    static const std::string maxAngleChangePerTickId;
+    static const std::string rangeInMetersId;
+    static const std::string hitboxId;
+
     bool _enabled;
     bool _rage;
     float _verticalPower;
@@ -66,43 +77,45 @@ public:
             ImGui::Checkbox("Enabled", &_enabled);
             ImGui::Checkbox("Rage", &_rage);
 
-            ImGui::SliderFloat("Vertical Power##Aimbot", &_verticalPower, 0.0f, 1.0f);
-            ImGui::SameLine();
-            ImGui::PushItemWidth(100); 
-            ImGui::InputFloat("##AimbotVertical Power1", &_verticalPower, 0.01f, 0.1f);
-            ImGui::PopItemWidth(); 
-
-            ImGui::SliderFloat("Horizontal Power##Aimbot", &_horizontalPower, 0.0f, 1.0f);
-            ImGui::SameLine();
-            ImGui::PushItemWidth(100); 
-            ImGui::InputFloat("##AimbotHorizontal Power1", &_horizontalPower, 0.01f, 0.1f);
-            ImGui::PopItemWidth(); 
-
-            ImGui::SliderFloat("Speed##Aimbot", &_speed, 0.0f, 100.0f);
-            ImGui::SameLine();
-            ImGui::PushItemWidth(100); 
-            ImGui::InputFloat("##AimbotSpeed1", &_speed, 0.25f, 0.1f);
-            ImGui::PopItemWidth(); 
-
-            ImGui::SliderFloat("Max Angle Change Per Tick##Aimbot", &_maxAngleChangePerTick, 0.0f, 50.0f);
-            ImGui::SameLine();
-            ImGui::PushItemWidth(100); 
-            ImGui::InputFloat("##AimbotMax Angle Change Per Tick", &_maxAngleChangePerTick, 0.25f, 2.5f);
-            ImGui::PopItemWidth(); 
-
-            ImGui::SliderFloat("Range In Meters##Aimbot", &_rangeInMeters, 0.0f, 1000.0f);
-            ImGui::SameLine();
-            ImGui::PushItemWidth(100); 
-            ImGui::InputFloat("##Aimbot Range In Meters 1", &_rangeInMeters, 1.0f, 10.0f);
-            ImGui::PopItemWidth(); 
-
-            ImGui::SliderInt("Hitbox##Aimbot", &_hitbox, 0, 5);
-            ImGui::SameLine();
-            ImGui::PushItemWidth(100); 
-            ImGui::InputInt("##Aimbot Hitbox 1", &_hitbox, 0.01f, 0.1f);
-            ImGui::PopItemWidth(); 
+            Renderer::renderImguiFloatValue("Vertical power", "Aimbot", &_verticalPower, 0.0f, 1.0f, 0.01f, 0.1f);
+            Renderer::renderImguiFloatValue("Horizontal power", "Aimbot", &_horizontalPower, 0.0f, 1.0f, 0.01f, 0.1f);
+            Renderer::renderImguiFloatValue("Speed", "Aimbot", &_speed, 0.0f, 1.0f, 0.01f, 0.1f);
+            Renderer::renderImguiFloatValue("Max angle change per tick", "Aimbot", &_maxAngleChangePerTick, 0.0f, 1.0f, 0.01f, 0.1f);
+            Renderer::renderImguiFloatValue("Range In Meters", "Aimbot", &_rangeInMeters, 0.0f, 1.0f, 0.01f, 0.1f);
+            Renderer::renderImguiIntValue("Hitbox", "Aimbot", &_hitbox, 0, 5, 1, 1);
 
             ImGui::EndTabItem();
         }
     }
+
+    void load(const SettingsContext& settingsContext) {
+        _enabled = settingsContext.loadBool(enabledId);
+        _rage = settingsContext.loadBool(rageId);
+        _verticalPower = settingsContext.loadFloat(verticalPowerId);
+        _horizontalPower = settingsContext.loadFloat(horizontalPowerId);
+        _speed = settingsContext.loadFloat(speedId);
+        _maxAngleChangePerTick = settingsContext.loadFloat(maxAngleChangePerTickId);
+        _rangeInMeters = settingsContext.loadFloat(rangeInMetersId);
+        _hitbox = settingsContext.loadInt(hitboxId);
+    }
+
+    void save(SettingsContext& settingsContext) const {
+        settingsContext.set(enabledId, _enabled);
+        settingsContext.set(rageId, _rage);
+        settingsContext.set(verticalPowerId, _verticalPower);
+        settingsContext.set(horizontalPowerId, _horizontalPower);
+        settingsContext.set(speedId, _speed);
+        settingsContext.set(maxAngleChangePerTickId, _maxAngleChangePerTick);
+        settingsContext.set(rangeInMetersId, _rangeInMeters);
+        settingsContext.set(hitboxId, _hitbox);
+    }
 };
+
+const std::string AimbotSettings::enabledId = "aimbot.enabled";
+const std::string AimbotSettings::rageId = "aimbot.rage";
+const std::string AimbotSettings::verticalPowerId = "aimbot.verticalPower";
+const std::string AimbotSettings::horizontalPowerId = "aimbot.horizontalPower";
+const std::string AimbotSettings::speedId = "aimbot.speed";
+const std::string AimbotSettings::maxAngleChangePerTickId = "aimbot.maxAngleChangePerTick";
+const std::string AimbotSettings::rangeInMetersId = "aimbot.rangeInMeters";
+const std::string AimbotSettings::hitboxId = "aimbot.hitbox";

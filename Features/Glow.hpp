@@ -28,7 +28,10 @@ private:
             return false;
         }
 
-        if(player->isDead() || !player->isEnemy() || !player->isInRange(settings.glowRangeInMeters())) {
+        if(player->isDead() ||
+            player->isKnocked() ||
+            !player->isEnemy() ||
+            !player->isInRange(settings.glowRangeInMeters())) {
             return false;
         }
 

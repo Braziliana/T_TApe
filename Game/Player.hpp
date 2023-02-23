@@ -286,19 +286,33 @@ public:
 
     void setGlowState(byte enabled, byte throughWalls) const {
         ulong glowEnablePtr = _basePointer + Offsets::getInstance().glowEnable;
-        Memory::getInstance().write(glowEnablePtr, enabled);
-
         ulong glowThroughWallPtr = _basePointer + Offsets::getInstance().glowThroughWall;
+
+        if(!Memory::isValidPointer(glowEnablePtr) || !Memory::isValidPointer(glowThroughWallPtr)) {
+            return;
+        }
+
+        Memory::getInstance().write(glowEnablePtr, enabled);
         Memory::getInstance().write(glowThroughWallPtr, throughWalls);
     }
 
     void setGlowColor(Color color) const {
         ulong ptr = _basePointer + Offsets::getInstance().glowColor;
+
+        if(!Memory::isValidPointer(ptr)) {
+            return;
+        }
+
         Memory::getInstance().write(ptr, color);
     }
 
     void setGlowMode(GlowMode glowMode) const {
         ulong ptr = _basePointer + Offsets::getInstance().glowMode;
+
+        if(!Memory::isValidPointer(ptr)) {
+            return;
+        }
+        
         Memory::getInstance().write(ptr, glowMode);
     }
 };
