@@ -37,13 +37,17 @@ private:
     }
 
     void renderLoadSaveTab() {
-        if(ImGui::BeginTabItem("RCS Settings")) {
-            if(ImGui::Button("Load")) {
+        if(ImGui::BeginTabItem("Load/Save")) {
+            
+            if(ImGui::Button("Load##Settings")) {
                 load();
             }
-            if(ImGui::Button("Save")) {
+
+            if(ImGui::Button("Save##Settings")) {
                 save();
             }
+
+            ImGui::EndTabItem();
         }
     }
 
@@ -92,7 +96,8 @@ public:
             _espSettings.render();
             _rcsSettings.render();
             _aimbotSettings.render();
-            
+            renderLoadSaveTab();
+
             ImGui::EndTabBar();
         }
 
