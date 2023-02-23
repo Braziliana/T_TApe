@@ -1,0 +1,46 @@
+# T_TApe
+1. Install Cinnamon desktop environment on Ubuntu
+sudo apt update
+
+sudo apt install cinnamon-desktop-environment
+
+reboot
+
+select cinnamon when you log in
+
+2. Install dependencies
+sudo apt update
+
+sudo apt install cmake xorg-dev libglu1-mesa-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
+
+3. remove from /usr/lib/x86_64-linux-gnu/ libglfw
+sudo rm /usr/lib/x86_64-linux-gnu/libglfw*
+
+4. build glfw
+git clone https://github.com/glfw/glfw.git
+
+cd glfw
+
+mkdir build
+
+cd build
+
+cmake ..
+
+make
+
+sudo make install
+
+
+
+5. Build
+mkdir build
+
+cd build
+
+cmake ..
+
+make
+
+6. Run
+sudo ./T_TApe
