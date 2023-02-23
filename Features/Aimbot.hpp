@@ -6,6 +6,8 @@
 #include "../Game/TimeManager.hpp"
 #include "../Utils/Logger.hpp"
 #include "../Utils/InputManager.hpp"
+#include "Settings.hpp"
+#include "AimbotSettings.hpp"
 
 class Aimbot
 {
@@ -16,13 +18,13 @@ private:
     Aimbot() {}
     ~Aimbot() {}
 
-    bool isValidTarget(Player* player) const {
+    bool isValidTarget(Player* player, const AimbotSettings& aimbotSettings) const {
 
         if(player == nullptr ||
             !player->isValid() ||
             !player->isAlive() ||
             !player->isVisible() ||
-            !player->isInRange(200) || 
+            !player->isInRange(aimbotSettings.getRangeInMeters()) || 
             !player->isEnemy()) {
     
             return false;
@@ -31,14 +33,14 @@ private:
         return true;
     }
 
-    Player* findBestTarget() const {
+    Player* findBestTarget(const AimbotSettings& aimbotSettings) const {
         float minDistance = 9999;
         Player* bestTarget = nullptr;
         Vector3d cameraPosition = LocalPlayer::getInstance().getCameraPosition();
         QAngle currentAngle = LocalPlayer::getInstance().getViewAngle();
         for(auto player : PlayerManager::getInstance()) {
 
-            if(!isValidTarget(player)) {
+            if(!isValidTarget(player, aimbotSettings)) {
                 continue;
             }
 
@@ -84,10 +86,10 @@ public:
         }   
 
         Player* target = _currentTarget;
-        if(!isValidTarget(target))
+        if(!isValidTarget(target, settings))
         {
-            target = findBestTarget();
-            if(!isValidTarget(target))
+            target = findBestTarget(settings);
+            if(!isValidTarget(target, settings))
             {
                 _currentTarget = nullptr;
                 return;
