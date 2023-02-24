@@ -44,5 +44,6 @@ target_include_directories(T_TApe PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/RenderEngine
   ${CMAKE_CURRENT_SOURCE_DIR}/Features
   ${CMAKE_CURRENT_SOURCE_DIR}/Game
+  ${CMAKE_CURRENT_SOURCE_DIR}/Game/Enums
   ${CMAKE_CURRENT_SOURCE_DIR}/UI
 )

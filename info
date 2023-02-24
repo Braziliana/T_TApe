@@ -44,3 +44,11 @@ make
 
 6. Run
 sudo ./T_TApe
+
+
+Linear smoothing: In linear smoothing, the aimbot's crosshair is moved a percentage of the distance between its current position and the target position. For example, if the aimbot is currently aiming 50 pixels away from the target and has a smoothing factor of 50%, it will aim halfway towards the target, i.e., 25 pixels away.
+Exponential smoothing: Exponential smoothing involves moving the aimbot's crosshair towards the target using an exponential function. This method results in a smoother movement compared to linear smoothing.
+S-curve smoothing: S-curve smoothing is similar to exponential smoothing, but the movement curve is shaped like an S. This method results in a smoother movement compared to linear smoothing, but it is slightly more aggressive than exponential smoothing.
+Bezier smoothing: This method uses a cubic Bezier curve to smoothly interpolate between two points. The curve is defined by four control points, and the angle is smoothly adjusted along the curve as the aim moves from the starting point to the target point.
+Acceleration smoothing: This method uses an acceleration function to gradually increase or decrease the speed of the aim movement. This creates a more natural and realistic motion, similar to how the human hand moves when aiming.
+Jerk-limited smoothing: This method limits the rate of change of acceleration (jerk) to create a smooth and consistent motion. This technique is commonly used in robotics and animation to create natural and realistic movements.

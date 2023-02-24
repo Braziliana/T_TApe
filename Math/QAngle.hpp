@@ -7,6 +7,7 @@
 #include "Vector3d.hpp"
 
 enum class AngleSmoothType {
+    LerpSmoothing,
     LinearSmoothing,
     ExponentialSmoothing,
     SCurveSmoothing,
@@ -149,21 +150,25 @@ struct QAngle {
         return *this + angleChange;
     }
 
-    static QAngle LinearSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
+    static QAngle lerpSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
+        return currentAngle.lerp(targetAngle, std::clamp(smoothingFactor, 0.0f, 1.0f));
+    }
+
+    static QAngle linearSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
         return currentAngle + (targetAngle - currentAngle) * smoothingFactor;
     }
 
-    static QAngle ExponentialSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
+    static QAngle exponentialSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
         return targetAngle * smoothingFactor + currentAngle * (1 - smoothingFactor);
     }
 
-    static QAngle SCurveSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
+    static QAngle sCurveSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
         float factor = smoothingFactor * smoothingFactor * (3 - 2 * smoothingFactor);
 
         return targetAngle * factor + currentAngle * (1 - factor);
     }
 
-    static QAngle BezierSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
+    static QAngle bezierSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
         const float distanceToTarget = currentAngle.distanceTo(targetAngle);
         const float t = 1.0f - pow(smoothingFactor, distanceToTarget);
         const float smoothness = 0.5f;
@@ -174,7 +179,7 @@ struct QAngle {
         return currentAngle * ((1 - t) * (1 - t)) + controlPoint * 2 * (1 - t) * t + targetAngle * (t * t);
     }
 
-    static QAngle AccelerationSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float deltaTime, const float maxAcceleration) {
+    static QAngle accelerationSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float deltaTime, const float maxAcceleration) {
         const float maxDeltaAngle = maxAcceleration * deltaTime;
         const QAngle deltaAngle = targetAngle - currentAngle;
         const float deltaAngleMagnitude = deltaAngle.length();

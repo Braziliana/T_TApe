@@ -18,13 +18,13 @@ private:
     Aimbot() {}
     ~Aimbot() {}
 
-    bool isValidTarget(Player* player, const AimbotSettings& aimbotSettings) const {
+    bool isValidTarget(Player* player, const AimbotSettings& settings) const {
 
         if(player == nullptr ||
             !player->isValid() ||
             !player->isAlive() ||
             !player->isVisible() ||
-            !player->isInRange(aimbotSettings.getRangeInMeters()) || 
+            !player->isInRange(settings.getRangeInMeters()) || 
             !player->isEnemy()) {
     
             return false;
@@ -33,14 +33,14 @@ private:
         return true;
     }
 
-    Player* findBestTarget(const AimbotSettings& aimbotSettings) const {
+    Player* findBestTarget(const AimbotSettings& settings) const {
         float minDistance = 9999;
         Player* bestTarget = nullptr;
         Vector3d cameraPosition = LocalPlayer::getInstance().getCameraPosition();
         QAngle currentAngle = LocalPlayer::getInstance().getViewAngle();
         for(auto player : PlayerManager::getInstance()) {
 
-            if(!isValidTarget(player, aimbotSettings)) {
+            if(!isValidTarget(player, settings)) {
                 continue;
             }
 
@@ -55,7 +55,13 @@ private:
                 continue;
             }
 
+
             double distanceFromCroshair = currentAngle.distanceTo(targetAngle);
+
+            if(!settings.isRage() && distanceFromCroshair > settings.getFieldOfView()) {
+                continue;
+            }
+
             if (distanceFromCroshair < minDistance)
             {
                 bestTarget = player;
@@ -104,30 +110,64 @@ public:
             return;
         }
 
-        Vector3d cameraPosition = LocalPlayer::getInstance().getCameraPosition();
+        QAngle targetAngle = getAngle(targePosition, settings);
 
-        QAngle newAngle;
-
-        if(!settings.isRage()) {
-            newAngle = LocalPlayer::getInstance()
-                .getViewAngle()
-                .lookAt(cameraPosition,
-                    targePosition,
-                    settings.getSpeed() * TimeManager::getInstance().getDeltaTime(),
-                    settings.getMaxAngleChangePerTick(),
-                    settings.getVerticalPower(),
-                    settings.getHorizontalPower());
-        }
-        else {
-            newAngle = LocalPlayer::getInstance().getViewAngle().lookAt(cameraPosition, targePosition);
-        }
-
-        if(!newAngle.isValid()) {
+        if(!targetAngle.isValid()) {
             return;
         }
         
-        LocalPlayer::getInstance().setViewAngle(newAngle);
+        LocalPlayer::getInstance().setViewAngle(targetAngle);
     }
+
+    QAngle getAngle(const Vector3d& targePosition, const AimbotSettings& settings) const {
+        const Vector3d cameraPosition = LocalPlayer::getInstance().getCameraPosition();
+        const QAngle currentAngle = LocalPlayer::getInstance().getViewAngle();
+        QAngle targetAngle = getAngle(targePosition, settings);
+        
+        if(settings.isRage()) {
+            return targetAngle;
+        }
+        
+        const float deltaTime = TimeManager::getInstance().getDeltaTime();
+        const float smoothingFactor = settings.getSpeed() * deltaTime;
+
+        switch (settings.getAngleSmoothType())
+        {
+        case AngleSmoothType::LerpSmoothing:
+            targetAngle = QAngle::lerpSmoothing(currentAngle, targetAngle, smoothingFactor);
+        case AngleSmoothType::LinearSmoothing:
+            targetAngle = QAngle::linearSmoothing(currentAngle, targetAngle, smoothingFactor);
+            break;
+        case AngleSmoothType::ExponentialSmoothing:
+            targetAngle = QAngle::exponentialSmoothing(currentAngle, targetAngle, smoothingFactor);
+            break;
+        case AngleSmoothType::SCurveSmoothing:
+            targetAngle = QAngle::sCurveSmoothing(currentAngle, targetAngle, smoothingFactor);
+            break;
+        case AngleSmoothType::BezierSmoothing:
+            targetAngle = QAngle::bezierSmoothing(currentAngle, targetAngle, smoothingFactor);
+            break;
+        case AngleSmoothType::AccelerationSmoothing:
+            targetAngle = QAngle::accelerationSmoothing(currentAngle, targetAngle, deltaTime, settings.getSpeed());
+            break;
+        case AngleSmoothType::JerkLimitedSmoothing: 
+            targetAngle = QAngle::jerkLimitedSmoothing(currentAngle, targetAngle, deltaTime, settings.getSpeed());
+            break;
+        default:
+            break;
+        }
+
+        QAngle angleChange = targetAngle - currentAngle;
+
+        const float maxAngleChange = settings.getMaxAngleChangePerTick();
+        angleChange = angleChange.clamp(-maxAngleChange, maxAngleChange);
+        
+        angleChange.x *= settings.getVerticalPower(); 
+        angleChange.y *= settings.getHorizontalPower();
+
+        return currentAngle + angleChange;
+    }
+
 
     QAngle predict(Vector3d start_pos, Vector3d target_pos, float projectile_speed, float gravity) {
         Vector3d delta_pos = target_pos - start_pos;

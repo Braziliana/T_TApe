@@ -43,6 +43,7 @@ void x11EventListener() {
     while (!stop_thread) {
         XNextEvent(display, &event);
         handleKeyEvent(display, &event);
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
     XCloseDisplay(display);
 }

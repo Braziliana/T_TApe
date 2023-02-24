@@ -1,13 +1,14 @@
 #pragma once
+#include <chrono>
+#include <thread>
 #include <GLFW/glfw3.h>
 #include <GL/gl.h>
 #define GLFW_EXPOSE_NATIVE_X11
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_glfw.h"
 #include "../imgui/imgui_impl_opengl3.h"
-
-
 #include "../Utils/InputManager.hpp"
+#include "../Features/Settings.hpp"
 
 class OverlayWindow
 {
@@ -248,6 +249,9 @@ public:
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
             glfwSwapBuffers(_window);
+
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(Settings::getInstance().getSleepIntervalMs()));
         }
 
         destroy();

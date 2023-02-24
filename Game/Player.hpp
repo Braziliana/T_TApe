@@ -3,13 +3,12 @@
 #include "../Utils/Memory.hpp"
 #include "Offsets.hpp"
 #include "LocalPlayer.hpp"
+#include "Enums/HitboxType.hpp"
 #include "../Math/Matrix.hpp"
 #include "../Math/Color.hpp"
 #include "GlowMode.hpp"
 #include "../Utils/Types.hpp"
 #include "../Utils/Logger.hpp"
-
-#include "../Utils/Types.hpp"
 #include "../Features/Settings.hpp" 
 
 class Player
@@ -90,8 +89,7 @@ private:
         return Memory::getInstance().read<Vector3d>(ptr);  
     }
     
-
-    int readBoneFromHitBox(int hitBox) const {
+    int readBoneFromHitBox(HitboxType hitBox) const {
 
         ulong modelPtr = Memory::getInstance().read<ulong>(_basePointer + Offsets::getInstance().studioHdr);
 		if (!Memory::isValidPointer(modelPtr)) {
@@ -111,7 +109,7 @@ private:
 
         auto indexCache = Memory::getInstance().read<uint16_t>(hitboxArray + 0x4);
         auto hitboxIndex = ((uint16_t)(indexCache & 0xFFFE) << (4 * (indexCache & 1)));
-        auto bonePtr = hitboxIndex + hitboxArray + (hitBox * 0x20);
+        auto bonePtr = hitboxIndex + hitboxArray + (static_cast<int>(hitBox) * 0x20);
         if(!Memory::isValidPointer(bonePtr)) {
             return -1;
         }
@@ -119,7 +117,7 @@ private:
         return Memory::getInstance().read<uint16_t>(bonePtr);
     }
     
-    Vector3d readBonePosition(int hitBox) {
+    Vector3d readBonePosition(HitboxType hitBox) {
         Vector3d offset = Vector3d(1.5f, 0.0f, 0.0f);
 
         int bone = readBoneFromHitBox(hitBox);
@@ -211,7 +209,7 @@ public:
         _position = readPosition();
         _vecAbsOrigin = readVecAbsOrigin();
 
-        int hitbox = Settings::getInstance().getAimbotSettings().getHitbox();
+        HitboxType hitbox = Settings::getInstance().getAimbotSettings().getHitbox();
         _aimBonePosition = readBonePosition(hitbox);
     }
 
