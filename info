@@ -49,10 +49,16 @@ sudo ./T_TApe
 # Info
 aimbot
 
-Vertical power: changes final speed of vertical angle
-Horizontal power: changes final speed of horizontal angle
+Vertical power: changes final change of vertical angle (angle * power)
+Horizontal power: changes final change of horizontal angle (angle * power)
 
+Speed: speed of changing angle with diffrent smoothing will work in difrent way
+Max angle change per tick: maximum value to angle change
+Range: maximum range to target
+Field of view: maximum angle distance to target
+Hitbox type: aim position 
 
+Experimental angle smoothing:
 Chat GTP suggested aim smoothing (Higly expermental, you might need to change speed and other aimbot settings to see dirrence)
 1. Linear smoothing: In linear smoothing, the aimbot's crosshair is moved a percentage of the distance between its current position and the target position. For example, if the aimbot is currently aiming 50 pixels away from the target and has a smoothing factor of 50%, it will aim halfway towards the target, i.e., 25 pixels away.
 2. Exponential smoothing: Exponential smoothing involves moving the aimbot's crosshair towards the target using an exponential function. This method results in a smoother movement compared to linear smoothing.
