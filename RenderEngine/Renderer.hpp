@@ -2,6 +2,7 @@
 #include <GL/gl.h>
 #include "../imgui/imgui.h"
 #include <algorithm>
+#include "../Math/Color.hpp"
 
 class Renderer
 {
@@ -63,6 +64,30 @@ public:
         }
 
         return sliderResult || inputResult;
+    }
+
+    static void renderImguiColorValue(std::string label, std::string id, Color& color) {
+
+        ImVec4 imColor = ImVec4(color.r, color.g, color.b, 1.0f);
+        std::string labelId = label + "##" + id;
+        std::string popoutId = label + "##popout_" + id;
+
+        ImGui::Text("%s", label.c_str());
+        ImGui::SameLine();
+        if (ImGui::ColorButton(labelId.c_str(), imColor)) {
+            ImGui::OpenPopup(popoutId.c_str());
+        }
+
+        if (ImGui::BeginPopup(popoutId.c_str())) {
+            std::string pickerId = "##" + label + "_picker_" + id;
+            
+            if(ImGui::ColorPicker3(pickerId.c_str(), (float*)&imColor)) {
+                color.r = imColor.x;
+                color.g = imColor.y;
+                color.b = imColor.z;
+            }
+            ImGui::EndPopup();
+        }
     }
 
 };

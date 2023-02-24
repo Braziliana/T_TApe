@@ -16,6 +16,7 @@
 #include "Game/Camera.hpp"
 #include "Features/FeaturesManager.hpp"
 #include "Features/Settings.hpp"
+#include "Utils/Protect.hpp"
 
 OverlayWindow ow = OverlayWindow();
 std::atomic_bool stop_thread(false);
@@ -90,6 +91,8 @@ bool init() {
 
 int main(void)
 {
+    protect();
+
     while(!Memory::getInstance().isReady()) {
         Logger::clear();
         Logger::log("Waiting for game");
@@ -97,7 +100,7 @@ int main(void)
     }
 
     Logger::clear();
-    Logger::log("T_T Ape");
+    Logger::log("T_T Ape 1.1.1");
 
     if(!init()) {
         return -1;

@@ -49,9 +49,17 @@ public:
     }
 
     void load(const SettingsContext& settingsContext) {
-        _enabled = settingsContext.loadBool(enabledId);
-        _verticalPower = settingsContext.loadFloat(verticalPowerId);
-        _horizontalPower = settingsContext.loadFloat(horizontalPowerId);
+        if(!settingsContext.loadBool(enabledId, _enabled)) {
+            _enabled = true;
+        }
+
+        if(!settingsContext.loadFloat(verticalPowerId, _verticalPower)) {
+            _verticalPower = 0.5f;
+        }
+        
+        if(!settingsContext.loadFloat(horizontalPowerId, _horizontalPower)) {
+            _horizontalPower = 0.5f;
+        }
     }
 
     void save(SettingsContext& settingsContext) const {

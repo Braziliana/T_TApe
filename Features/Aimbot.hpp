@@ -55,7 +55,6 @@ private:
                 continue;
             }
 
-
             double distanceFromCroshair = currentAngle.distanceTo(targetAngle);
 
             if(!settings.isRage() && distanceFromCroshair > settings.getFieldOfView()) {

@@ -6,14 +6,14 @@
 #include "Vector2d.hpp"
 #include "Vector3d.hpp"
 
-enum class AngleSmoothType {
-    LerpSmoothing,
-    LinearSmoothing,
-    ExponentialSmoothing,
-    SCurveSmoothing,
-    BezierSmoothing,
-    AccelerationSmoothing,
-    JerkLimitedSmoothing
+enum class AngleSmoothType : int{
+    LerpSmoothing = 0,
+    LinearSmoothing = 1,
+    ExponentialSmoothing = 2,
+    SCurveSmoothing = 3,
+    BezierSmoothing = 4,
+    AccelerationSmoothing = 5,
+    JerkLimitedSmoothing = 6
 };
 
 struct QAngle {
@@ -120,7 +120,7 @@ struct QAngle {
 
         result.y = atan2f(direction.y, direction.x) * (180 / M_PI);
 
-        return result;
+        return result.fixAngle();
     }
 
     QAngle lookAt(const Vector3d& from, const Vector3d& target, float t) const {
@@ -131,7 +131,7 @@ struct QAngle {
         }
 
         t = std::clamp(t, 0.0f, 1.0f);
-        return lerp(targetAngle, t);
+        return lerp(targetAngle, t).fixAngle();
     }
 
     QAngle lookAt(const Vector3d& from, const Vector3d& target, float t, float maxAngleChange, float verticalChange = 1.0f, float horizontalChange = 1.0f) const {
@@ -147,25 +147,28 @@ struct QAngle {
         angleChange.x *= verticalChange; 
         angleChange.y *= horizontalChange;
 
-        return *this + angleChange;
+        return (*this + angleChange).fixAngle();
     }
 
     static QAngle lerpSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
-        return currentAngle.lerp(targetAngle, std::clamp(smoothingFactor, 0.0f, 1.0f));
+        return currentAngle.lerp(targetAngle, std::clamp(smoothingFactor, 0.0f, 1.0f)).fixAngle();
     }
 
     static QAngle linearSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
-        return currentAngle + (targetAngle - currentAngle) * smoothingFactor;
+        auto result = currentAngle + (targetAngle - currentAngle) * smoothingFactor;
+        return result.fixAngle();
     }
 
     static QAngle exponentialSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
-        return targetAngle * smoothingFactor + currentAngle * (1 - smoothingFactor);
+        auto result =  targetAngle * smoothingFactor + currentAngle * (1 - smoothingFactor);
+        return result.fixAngle();
     }
 
     static QAngle sCurveSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
         float factor = smoothingFactor * smoothingFactor * (3 - 2 * smoothingFactor);
 
-        return targetAngle * factor + currentAngle * (1 - factor);
+        auto result = targetAngle * factor + currentAngle * (1 - factor);
+        return result.fixAngle();
     }
 
     static QAngle bezierSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float smoothingFactor) {
@@ -176,7 +179,8 @@ struct QAngle {
         const QAngle midAngle = (currentAngle + targetAngle) * 0.5f;
         const QAngle controlPoint = (midAngle - currentAngle) * smoothness + currentAngle;
         
-        return currentAngle * ((1 - t) * (1 - t)) + controlPoint * 2 * (1 - t) * t + targetAngle * (t * t);
+        auto result = currentAngle * ((1 - t) * (1 - t)) + controlPoint * 2 * (1 - t) * t + targetAngle * (t * t);
+        return result.fixAngle();
     }
 
     static QAngle accelerationSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float deltaTime, const float maxAcceleration) {
@@ -190,7 +194,8 @@ struct QAngle {
 
         const QAngle deltaAngleNormalized = deltaAngle / deltaAngleMagnitude;
 
-        return currentAngle + deltaAngleNormalized * maxDeltaAngle;
+        auto result = currentAngle + deltaAngleNormalized * maxDeltaAngle;
+        return result.fixAngle();
     }
 
     static QAngle jerkLimitedSmoothing(const QAngle& currentAngle, const QAngle& targetAngle, const float deltaTime, const float maxJerk) {
@@ -204,7 +209,8 @@ struct QAngle {
 
         const QAngle deltaAngleNormalized = deltaAngle / deltaAngleMagnitude;
 
-        return currentAngle + deltaAngleNormalized * maxDeltaAngle;
+        auto result = currentAngle + deltaAngleNormalized * maxDeltaAngle;
+        return result.fixAngle();
     }
 
     inline QAngle lerp(const QAngle& other, float t) const {

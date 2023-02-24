@@ -54,7 +54,7 @@ private:
 
     QAngle readViewAngle() {
         ulong ptr = _basePointer + Offsets::getInstance().viewAngle;
-        return Memory::getInstance().read<QAngle>(ptr);
+        return Memory::getInstance().read<QAngle>(ptr).fixAngle();
     }
 
     void writeViewAngle(QAngle viewAngle) {

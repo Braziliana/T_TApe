@@ -27,7 +27,7 @@ private:
         }
         else {
             _rcsSettings = RcsSettings(true, 0.75, 0.5);
-            _aimbotSettings = AimbotSettings(false, false, 1.0f, 1.0f, 5.0f, 0.25f, 250.0f, HitboxType::UpperChest, 90.0f);
+            _aimbotSettings = AimbotSettings(false, false, 1.0f, 1.0f, 5.0f, 0.25f, 250.0f, HitboxType::UpperChest, 45.0f);
             _espSettings = EspSettings(true, 1000, false, 100);
             _sleepIntervalMs = 10;
             save();
@@ -37,14 +37,17 @@ private:
     ~Settings() {}
 
     void internalLoad() {
-        _sleepIntervalMs = _settingsContext.loadInt(sleepIntervalMsId);
+
+        if(!_settingsContext.loadInt(sleepIntervalMsId, _sleepIntervalMs)) {
+            _sleepIntervalMs = 10;
+        }
 
         _espSettings.load(_settingsContext);
         _rcsSettings.load(_settingsContext);
         _aimbotSettings.load(_settingsContext);
     }
 
-    void renderLoadSaveTab() {
+    void renderMisc() {
         if(ImGui::BeginTabItem("Misc")) {
             
             Renderer::renderImguiIntValue("Sleep interval ms (should recude cpu usage)", "Misc", &_sleepIntervalMs, 1, 100, 1, 5);          
@@ -104,13 +107,13 @@ public:
             return;
         }
 
-        ImGui::Begin("T_T Ape 1.1.0");
+        ImGui::Begin("T_T Ape 1.1.1");
         
         if (ImGui::BeginTabBar("Settings")) {
             _espSettings.render();
             _rcsSettings.render();
             _aimbotSettings.render();
-            renderLoadSaveTab();
+            renderMisc();
 
             ImGui::EndTabBar();
         }

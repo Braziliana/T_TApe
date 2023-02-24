@@ -39,7 +39,7 @@ public:
         _maxAngleChangePerTick(0.25f),
         _rangeInMeters(250.0f),
         _hitbox(HitboxType::UpperChest),
-        _fieldOfView(90) {}
+        _fieldOfView(45.0f) {}
     
     AimbotSettings(bool enabled, bool rage, float verticalPower, float horizontalPower, float speed, float maxAngleChangePerTick, float rangeInMeters, HitboxType hitbox, float fieldOfView) : 
         _enabled(enabled),
@@ -130,15 +130,53 @@ public:
     }
 
     void load(const SettingsContext& settingsContext) {
-        _enabled = settingsContext.loadBool(enabledId);
-        _rage = settingsContext.loadBool(rageId);
-        _verticalPower = settingsContext.loadFloat(verticalPowerId);
-        _horizontalPower = settingsContext.loadFloat(horizontalPowerId);
-        _speed = settingsContext.loadFloat(speedId);
-        _maxAngleChangePerTick = settingsContext.loadFloat(maxAngleChangePerTickId);
-        _rangeInMeters = settingsContext.loadFloat(rangeInMetersId);
-        _hitbox = static_cast<HitboxType>(settingsContext.loadInt(hitboxId));
-        _fieldOfView = settingsContext.loadFloat(fieldOfViewId);
+        if(!settingsContext.loadBool(enabledId, _enabled)) {
+            _enabled = false;
+        }
+
+        if(!settingsContext.loadBool(rageId,_rage)) {
+            _rage = false;
+        }
+
+        if(!settingsContext.loadFloat(verticalPowerId, _verticalPower)) {
+            _verticalPower = 1.0f;
+        }
+
+        if(!settingsContext.loadFloat(horizontalPowerId, _horizontalPower)) {
+            _horizontalPower = 1.0f;
+        }
+
+        if(!settingsContext.loadFloat(speedId, _speed)) {
+            _speed = 5.0f;
+        }
+
+        if(!settingsContext.loadFloat(maxAngleChangePerTickId, _maxAngleChangePerTick)) {
+            _maxAngleChangePerTick = 0.25f;
+        }
+
+        if(!settingsContext.loadFloat(rangeInMetersId, _rangeInMeters)) {
+            _rangeInMeters = 250.0f;
+        }
+
+        int hitboxValue = 0;
+        if(settingsContext.loadInt(hitboxId, hitboxValue)) {
+            _hitbox = static_cast<HitboxType>(hitboxValue);
+        }
+        else {
+            _hitbox = HitboxType::UpperChest;
+        }
+
+        if(!settingsContext.loadFloat(fieldOfViewId, _fieldOfView)) {
+            _fieldOfView = 45.0f;
+        }
+
+        int angleSmoothTypeValue = 0;
+        if(settingsContext.loadInt(angleSmoothTypeId, angleSmoothTypeValue)) {
+            _angleSmoothType = static_cast<AngleSmoothType>(angleSmoothTypeValue);
+        }
+        else {
+            _angleSmoothType = AngleSmoothType::LerpSmoothing;
+        }
     }
 
     void save(SettingsContext& settingsContext) const {
@@ -151,6 +189,7 @@ public:
         settingsContext.set(rangeInMetersId, _rangeInMeters);
         settingsContext.set(hitboxId, static_cast<int>(_hitbox));
         settingsContext.set(fieldOfViewId, _fieldOfView);
+        settingsContext.set(angleSmoothTypeId, static_cast<int>(_angleSmoothType));
     }
 };
 

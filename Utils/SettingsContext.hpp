@@ -64,6 +64,10 @@ public:
     void set(const std::string& name, const std::string& value) {
         _settings[name] = value;
     }
+    
+    void set(const std::string& name, const float* value, const int& size) {
+        _settings[name] = vectorToString(value, size);
+    }
 
     std::string loadString(const std::string& name) const {
         auto it = _settings.find(name);
@@ -74,34 +78,54 @@ public:
         return "";
     }
 
-    int loadInt(const std::string& name) const {
-        auto value = loadString(name);
+    bool loadInt(const std::string& name, int& value) const {
+        auto valueStr = loadString(name);
 
-        if(value.empty()) {
-            return 0;
-        }
-
-        return std::stoi(value);
-    }
-
-    float loadFloat(const std::string& name) const {
-        auto value = loadString(name);
-        
-        if(value.empty()) {
-            return 0;
-        }
-
-        return std::stof(value);
-    }
-
-    bool loadBool(const std::string& name) const {
-        auto value = loadString(name);
-        
-        if(value.empty()) {
+        if(valueStr.empty()) {
+            value = 0;
             return false;
         }
 
-        return std::stoi(value) != 0;
+        value = std::stoi(valueStr);
+        return true;
+    }
+
+    bool loadFloat(const std::string& name, float& value) const {
+        auto valueStr = loadString(name);
+        
+        if(valueStr.empty()) {
+            value = 0.0f;
+            return false;
+        }
+
+        value = std::stof(valueStr);
+        return true;
+    }
+
+    bool loadBool(const std::string& name, bool& value) const {
+        auto valueStr = loadString(name);
+        
+        if(valueStr.empty()) {
+            value = false;
+            return false;
+        }
+
+        value = std::stoi(valueStr) != 0;
+        return true;
+    }
+
+    bool loadVector(const std::string& name, float* vector, int size) const {
+        auto value = loadString(name);
+        
+        if(value.empty()) {
+            for(int i = 0; i < size; i++) {
+                vector[i] = 0;
+            }
+            return false;
+        }
+
+        stringToVector(value, vector, size);
+        return true;
     }
 
     void save() const {
