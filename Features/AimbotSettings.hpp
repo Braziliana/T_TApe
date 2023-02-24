@@ -100,9 +100,9 @@ public:
 
             Renderer::renderImguiFloatValue("Vertical power", "Aimbot", &_verticalPower, 0.0f, 1.0f, 0.01f, 0.1f);
             Renderer::renderImguiFloatValue("Horizontal power", "Aimbot", &_horizontalPower, 0.0f, 1.0f, 0.01f, 0.1f);
-            Renderer::renderImguiFloatValue("Speed", "Aimbot", &_speed, 0.0f, 1.0f, 0.01f, 0.1f);
-            Renderer::renderImguiFloatValue("Max angle change per tick", "Aimbot", &_maxAngleChangePerTick, 0.0f, 1.0f, 0.01f, 0.1f);
-            Renderer::renderImguiFloatValue("Range In Meters", "Aimbot", &_rangeInMeters, 0.0f, 1.0f, 0.01f, 0.1f);
+            Renderer::renderImguiFloatValue("Speed", "Aimbot", &_speed, 0.0f, 1000.0f, 0.1f, 5.0f);
+            Renderer::renderImguiFloatValue("Max angle change per tick", "Aimbot", &_maxAngleChangePerTick, 0.01f, 10.0f, 0.01f, 0.1f);
+            Renderer::renderImguiFloatValue("Range In Meters", "Aimbot", &_rangeInMeters, 10.0f, 2000.0f, 1.0f, 10.0f);
             Renderer::renderImguiFloatValue("Field of view", "Aimbot", &_fieldOfView, 1.0f, 360.0f, 1.0f, 5.0f);
 
             const char* hitboxTypes[] = { "Head", "Neck", "Upper chest", "Lower chest", "Stomach", "Hip" };
