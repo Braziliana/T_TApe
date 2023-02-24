@@ -62,8 +62,9 @@ bool update() {
 
         return true;
     }
-    catch(...) {
-        return false;
+    catch(const std::exception& ex) {
+        std::cout << "Error: " << ex.what() << std::endl;
+        return true;
     }
 
     return false;

@@ -111,7 +111,7 @@ public:
             _hitbox = static_cast<HitboxType>(hitboxTypeIndex);
 
             const char* angleSmoothTypeNames[] = {
-                "Lerp smoothing"
+                "Lerp smoothing",
                 "Linear smoothing",
                 "Exponential smoothing",
                 "S-Curve smoothing",

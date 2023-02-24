@@ -122,7 +122,7 @@ public:
     QAngle getAngle(const Vector3d& targePosition, const AimbotSettings& settings) const {
         const Vector3d cameraPosition = LocalPlayer::getInstance().getCameraPosition();
         const QAngle currentAngle = LocalPlayer::getInstance().getViewAngle();
-        QAngle targetAngle = getAngle(targePosition, settings);
+        QAngle targetAngle = currentAngle.lookAt(cameraPosition, targePosition);
         
         if(settings.isRage()) {
             return targetAngle;
@@ -135,6 +135,7 @@ public:
         {
         case AngleSmoothType::LerpSmoothing:
             targetAngle = QAngle::lerpSmoothing(currentAngle, targetAngle, smoothingFactor);
+            break;
         case AngleSmoothType::LinearSmoothing:
             targetAngle = QAngle::linearSmoothing(currentAngle, targetAngle, smoothingFactor);
             break;
