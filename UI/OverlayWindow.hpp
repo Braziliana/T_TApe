@@ -112,8 +112,6 @@ public:
 
         ImGui_ImplGlfw_InitForOpenGL(_window, true);
         ImGui_ImplOpenGL3_Init("#version 330 core");
-
-        ImGui::SetNextWindowSize(ImVec2(600, 300));
     }
 
     void style() {
@@ -219,6 +217,8 @@ public:
     }
 
     void run(bool(*update)(), void(*renderImgui)()) {
+
+        ImGui::SetNextWindowSize(ImVec2(850, 450));
         while(!glfwWindowShouldClose(_window)) {
             glfwPollEvents();
 

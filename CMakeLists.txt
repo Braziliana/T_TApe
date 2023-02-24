@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 
-project(T_TApe VERSION 1.0)
+project(T_TApe VERSION 1.1.0)
 
 # Set C++ standard to C++23
 set(CMAKE_CXX_STANDARD 23)
