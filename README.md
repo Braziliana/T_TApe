@@ -24,6 +24,9 @@ select cinnamon when you log in
 sudo apt update
 ```
 ```bash
+sudo apt-get install -y libudev-dev
+```
+```bash
 sudo apt install cmake xorg-dev libglu1-mesa-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
 ```
 

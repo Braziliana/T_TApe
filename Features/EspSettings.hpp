@@ -14,13 +14,14 @@ struct EspSettings
 private:
     static const std::string glowEnabledId;
     static const std::string glowTypeId;
-    static const std::string glowStrengthId;
     static const std::string glowRangeInMetersId;
     static const std::string glowStaticColorId;
     static const std::string glowMaxShieldColorId;
     static const std::string glowMinShieldColorId;
     static const std::string glowMaxHealthColorId;
     static const std::string glowMinHealthColorId;
+    static const std::string glowTransparentLevelId;
+    static const std::string glowBorderId;
 
     static const std::string drawHitboxPositionId;
     static const std::string hitboxRangeInMetersId;
@@ -29,6 +30,7 @@ private:
     GlowType _glowType;
     float _glowRangeInMeters;
     byte _glowTransparentLevel;
+    byte _glowBorder;
     Color _glowStaticColor;
     Color _glowMaxShieldColor;
     Color _glowMinShieldColor;
@@ -44,6 +46,7 @@ public:
         _glowType(GlowType::DynamicColorGlow),
         _glowRangeInMeters(1000),
         _glowTransparentLevel(90),
+        _glowBorder(46),
         _glowStaticColor(1.0f, 1.0f, 1.0f),
         _glowMaxShieldColor(0.0f, 0.0f, 1.0f),
         _glowMinShieldColor(1.0f, 1.0f, 1.0f),
@@ -60,8 +63,12 @@ public:
         return _glowRangeInMeters;
     }
 
-    float getGlowTransparentLevel() const {
+    byte getGlowTransparentLevel() const {
         return _glowTransparentLevel;
+    }
+
+    byte getGlowBorder() const {
+        return _glowBorder;
     }
 
     GlowType getGlowType() const {
@@ -108,7 +115,11 @@ public:
                 _glowTransparentLevel = std::clamp(glowTransparentLevel, 0, 255);
             }
 
-            //_glowTransparentLevel
+            int glowBorder = _glowBorder;
+            if(Renderer::renderImguiIntValue("Glow border", "ESP", &glowBorder, 1.0, 255, 1, 10))
+            {
+                _glowBorder = std::clamp(glowBorder, 0, 255);
+            }
 
             const char* glowTypes[] = { "DynamicColorGlow", "StaticColorGlow" };
             int glowType = static_cast<int>(_glowType);
@@ -149,10 +160,6 @@ public:
             _glowRangeInMeters = 1000;
         }
 
-        if(!settingsContext.loadByte(glowStrengthId, _glowTransparentLevel)) {
-            _glowTransparentLevel = 90;
-        }
-
         if(!settingsContext.loadVector(glowStaticColorId, (float*)&_glowStaticColor, Color::size)) {
             _glowStaticColor = Color(1.0f, 1.0f, 1.0f);
         }
@@ -173,6 +180,14 @@ public:
             _glowMinHealthColor = Color(1.0f, 0.0f, 0.0f);
         }
 
+        if(!settingsContext.loadByte(glowTransparentLevelId, _glowTransparentLevel)) {
+            _glowTransparentLevel = 90;
+        }
+
+        if(!settingsContext.loadByte(glowBorderId, _glowBorder)) {
+            _glowBorder = 46;
+        }
+
         if(!settingsContext.loadBool(drawHitboxPositionId, _drawHitboxPosition)) {
             _drawHitboxPosition = false;
         }
@@ -186,27 +201,29 @@ public:
         settingsContext.set(glowEnabledId, _glowEnabled);
         settingsContext.set(glowTypeId, static_cast<int>(_glowType));
         settingsContext.set(glowRangeInMetersId, _glowRangeInMeters);
-        settingsContext.set(glowStrengthId, _glowTransparentLevel);
         settingsContext.set(glowStaticColorId, (float*)&_glowStaticColor, Color::size);
         settingsContext.set(glowMaxShieldColorId, (float*)&_glowMaxShieldColor, Color::size);
         settingsContext.set(glowMinShieldColorId, (float*)&_glowMinShieldColor, Color::size);
         settingsContext.set(glowMaxHealthColorId, (float*)&_glowMaxHealthColor, Color::size);
         settingsContext.set(glowMinHealthColorId, (float*)&_glowMinHealthColor, Color::size);
+        settingsContext.set(glowTransparentLevelId, _glowTransparentLevel);
+        settingsContext.set(glowBorderId, _glowBorder);
 
         settingsContext.set(drawHitboxPositionId, _drawHitboxPosition);
         settingsContext.set(hitboxRangeInMetersId, _hitboxRangeInMeters);
     }
 };
-//glowStrengthId
+//glowTransparentLevelId
 const std::string EspSettings::glowEnabledId = "esp.glowEnabled";
 const std::string EspSettings::glowTypeId = "esp.glowType";
 const std::string EspSettings::glowRangeInMetersId = "esp.glowRangeInMeters";
-const std::string EspSettings::glowStrengthId = "esp.glowTransparentLevel";
 const std::string EspSettings::glowStaticColorId = "esp.glowStaticColor";
 const std::string EspSettings::glowMaxShieldColorId = "esp.glowMaxShieldColor";
 const std::string EspSettings::glowMinShieldColorId = "esp.glowMinShieldColor";
 const std::string EspSettings::glowMaxHealthColorId = "esp.glowMaxHealthColor";
 const std::string EspSettings::glowMinHealthColorId = "esp.glowMinHealthColor";
+const std::string EspSettings::glowTransparentLevelId = "esp.glowTransparentLevel";
+const std::string EspSettings::glowBorderId = "esp.glowBorderId";
 
 const std::string EspSettings::drawHitboxPositionId = "esp.drawHitboxPosition";
 const std::string EspSettings::hitboxRangeInMetersId = "esp.hitboxRangeInMeters";
