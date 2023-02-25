@@ -13,6 +13,7 @@ struct EspSettings
 {
 private:
     static const std::string glowEnabledId;
+    static const std::string glowModeEnabledId;
     static const std::string glowTypeId;
     static const std::string glowRangeInMetersId;
     static const std::string glowStaticColorId;
@@ -27,6 +28,7 @@ private:
     static const std::string hitboxRangeInMetersId;
 
     bool _glowEnabled;
+    bool _glowModeEnabled;
     GlowType _glowType;
     float _glowRangeInMeters;
     byte _glowTransparentLevel;
@@ -43,6 +45,7 @@ private:
 public:
     EspSettings() :
         _glowEnabled(true),
+        _glowModeEnabled(false),
         _glowType(GlowType::DynamicColorGlow),
         _glowRangeInMeters(1000),
         _glowTransparentLevel(90),
@@ -57,6 +60,10 @@ public:
 
     bool isGlowEnabled() const {
         return _glowEnabled;
+    }
+
+    bool isGlowModeEnabled() const {
+        return _glowModeEnabled;
     }
 
     float glowRangeInMeters() const {
@@ -107,18 +114,19 @@ public:
         if(ImGui::BeginTabItem("ESP Settings")) {
 
             ImGui::Checkbox("Glow##ESP", &_glowEnabled);
+            ImGui::Checkbox("Glow mode(sets transparen level and border size)##ESP", &_glowModeEnabled);
             Renderer::renderImguiFloatValue("Glow range in meters", "ESP", &_glowRangeInMeters, 25.0f, 10000.0f, 1.0f, 50.0f);
             
-            int glowTransparentLevel = _glowTransparentLevel;
-            if(Renderer::renderImguiIntValue("Glow transparent level", "ESP", &glowTransparentLevel, 1.0, 255, 1, 10))
-            {
-                _glowTransparentLevel = std::clamp(glowTransparentLevel, 0, 255);
-            }
+            if(_glowModeEnabled) {
+                int glowTransparentLevel = _glowTransparentLevel;
+                if(Renderer::renderImguiIntValue("Glow transparent level", "ESP", &glowTransparentLevel, 1.0, 255, 1, 10)) {
+                    _glowTransparentLevel = std::clamp(glowTransparentLevel, 0, 255);
+                }
 
-            int glowBorder = _glowBorder;
-            if(Renderer::renderImguiIntValue("Glow border", "ESP", &glowBorder, 1.0, 255, 1, 10))
-            {
-                _glowBorder = std::clamp(glowBorder, 0, 255);
+                int glowBorder = _glowBorder;
+                if(Renderer::renderImguiIntValue("Glow border", "ESP", &glowBorder, 1.0, 255, 1, 10)) {
+                    _glowBorder = std::clamp(glowBorder, 0, 255);
+                }
             }
 
             const char* glowTypes[] = { "DynamicColorGlow", "StaticColorGlow" };
@@ -146,6 +154,10 @@ public:
     void load(const SettingsContext& settingsContext) {
         if(!settingsContext.loadBool(glowEnabledId, _glowEnabled)) {
             _glowEnabled = true;
+        }
+
+        if(!settingsContext.loadBool(glowModeEnabledId, _glowModeEnabled)) {
+            _glowModeEnabled = false;
         }
 
         int glowTypeValue = 0;
@@ -199,6 +211,7 @@ public:
 
     void save(SettingsContext& settingsContext) const {
         settingsContext.set(glowEnabledId, _glowEnabled);
+        settingsContext.set(glowModeEnabledId, _glowModeEnabled);
         settingsContext.set(glowTypeId, static_cast<int>(_glowType));
         settingsContext.set(glowRangeInMetersId, _glowRangeInMeters);
         settingsContext.set(glowStaticColorId, (float*)&_glowStaticColor, Color::size);
@@ -215,6 +228,7 @@ public:
 };
 //glowTransparentLevelId
 const std::string EspSettings::glowEnabledId = "esp.glowEnabled";
+const std::string EspSettings::glowModeEnabledId = "esp.glowModeEnabled";
 const std::string EspSettings::glowTypeId = "esp.glowType";
 const std::string EspSettings::glowRangeInMetersId = "esp.glowRangeInMeters";
 const std::string EspSettings::glowStaticColorId = "esp.glowStaticColor";
