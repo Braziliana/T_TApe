@@ -6,7 +6,8 @@
 
 enum class GlowType : int {
     DynamicColorGlow = 0,
-    StaticColorGlow = 1
+    StaticColorGlow = 1,
+    BasicGlow = 2
 };
 
 struct EspSettings
@@ -24,8 +25,8 @@ private:
     static const std::string glowTransparentLevelId;
     static const std::string glowBorderId;
 
-    static const std::string drawHitboxPositionId;
-    static const std::string hitboxRangeInMetersId;
+    static const std::string espEnabledId;
+    static const std::string espRangeInMetersId;
 
     bool _glowEnabled;
     bool _glowModeEnabled;
@@ -39,8 +40,8 @@ private:
     Color _glowMaxHealthColor;
     Color _glowMinHealthColor;
 
-    bool _drawHitboxPosition;
-    float _hitboxRangeInMeters;
+    bool _espEnabled;
+    float _espRangeInMeters;
 
 public:
     EspSettings() :
@@ -55,8 +56,8 @@ public:
         _glowMinShieldColor(1.0f, 1.0f, 1.0f),
         _glowMaxHealthColor(0.0f, 1.0f, 0.0f),
         _glowMinHealthColor(1.0f, 0.0f, 0.0f),
-        _drawHitboxPosition(false),
-        _hitboxRangeInMeters(100) {}
+        _espEnabled(false),
+        _espRangeInMeters(100) {}
 
     bool isGlowEnabled() const {
         return _glowEnabled;
@@ -102,50 +103,53 @@ public:
         return _glowMinHealthColor;
     }
      
-    bool isDrawHitboxPositionEnabled() const {
-        return _drawHitboxPosition;
+    bool isEspEnabled() const {
+        return _espEnabled;
     }
 
-    float hitboxRangeInMeters() const {
-        return _hitboxRangeInMeters;
+    float getEspRangeInMeters() const {
+        return _espRangeInMeters;
     }
 
     void render() {
         if(ImGui::BeginTabItem("ESP Settings")) {
 
             ImGui::Checkbox("Glow##ESP", &_glowEnabled);
-            ImGui::Checkbox("Glow mode(sets transparen level and border size)##ESP", &_glowModeEnabled);
             Renderer::renderImguiFloatValue("Glow range in meters", "ESP", &_glowRangeInMeters, 25.0f, 10000.0f, 1.0f, 50.0f);
             
-            if(_glowModeEnabled) {
-                int glowTransparentLevel = _glowTransparentLevel;
-                if(Renderer::renderImguiIntValue("Glow transparent level", "ESP", &glowTransparentLevel, 1.0, 255, 1, 10)) {
-                    _glowTransparentLevel = std::clamp(glowTransparentLevel, 0, 255);
-                }
-
-                int glowBorder = _glowBorder;
-                if(Renderer::renderImguiIntValue("Glow border", "ESP", &glowBorder, 1.0, 255, 1, 10)) {
-                    _glowBorder = std::clamp(glowBorder, 0, 255);
-                }
-            }
-
-            const char* glowTypes[] = { "DynamicColorGlow", "StaticColorGlow" };
+            const char* glowTypes[] = { "Dynamic color", "Static color", "Basic" };
             int glowType = static_cast<int>(_glowType);
             ImGui::Combo("Glow type##ESP", &glowType, glowTypes, IM_ARRAYSIZE(glowTypes));
             _glowType = static_cast<GlowType>(glowType);
 
-            if(_glowType == GlowType::DynamicColorGlow) {
-                Renderer::renderImguiColorValue("Glow max shield color", "ESP", _glowMaxShieldColor);
-                Renderer::renderImguiColorValue("Glow min shield color", "ESP", _glowMinShieldColor);
-                Renderer::renderImguiColorValue("Glow max health color", "ESP", _glowMaxHealthColor);
-                Renderer::renderImguiColorValue("Glow min health color", "ESP", _glowMinHealthColor);
-            }
-            else {
-                Renderer::renderImguiColorValue("Glow color", "ESP", _glowStaticColor);
+            if(_glowType != GlowType::BasicGlow) {
+                ImGui::Checkbox("Glow mode(sets transparen level and border size)##ESP", &_glowModeEnabled);
+                
+                if(_glowModeEnabled) {
+                    int glowTransparentLevel = _glowTransparentLevel;
+                    if(Renderer::renderImguiIntValue("Glow transparent level", "ESP", &glowTransparentLevel, 1.0, 255, 1, 10)) {
+                        _glowTransparentLevel = std::clamp(glowTransparentLevel, 0, 255);
+                    }
+
+                    int glowBorder = _glowBorder;
+                    if(Renderer::renderImguiIntValue("Glow border", "ESP", &glowBorder, 1.0, 255, 1, 10)) {
+                        _glowBorder = std::clamp(glowBorder, 0, 255);
+                    }
+                }
+
+                if(_glowType == GlowType::DynamicColorGlow) {
+                    Renderer::renderImguiColorValue("Glow max shield color", "ESP", _glowMaxShieldColor);
+                    Renderer::renderImguiColorValue("Glow min shield color", "ESP", _glowMinShieldColor);
+                    Renderer::renderImguiColorValue("Glow max health color", "ESP", _glowMaxHealthColor);
+                    Renderer::renderImguiColorValue("Glow min health color", "ESP", _glowMinHealthColor);
+                }
+                else {
+                    Renderer::renderImguiColorValue("Glow color", "ESP", _glowStaticColor);
+                }
             }
 
-            ImGui::Checkbox("Hitbox Position##ESP", &_drawHitboxPosition);
-            Renderer::renderImguiFloatValue("Hitbox range in meters", "ESP", &_hitboxRangeInMeters, 25.0f, 500.0f, 1.0f, 25.0f);
+            ImGui::Checkbox("Esp enabled##ESP", &_espEnabled);
+            Renderer::renderImguiFloatValue("Esp range in meters", "ESP", &_espRangeInMeters, 25.0f, 500.0f, 1.0f, 25.0f);
 
             ImGui::EndTabItem();
         }
@@ -200,12 +204,12 @@ public:
             _glowBorder = 46;
         }
 
-        if(!settingsContext.loadBool(drawHitboxPositionId, _drawHitboxPosition)) {
-            _drawHitboxPosition = false;
+        if(!settingsContext.loadBool(espEnabledId, _espEnabled)) {
+            _espEnabled = false;
         }
 
-        if(!settingsContext.loadFloat(hitboxRangeInMetersId, _hitboxRangeInMeters), _hitboxRangeInMeters) {
-            _hitboxRangeInMeters = 100.0f;
+        if(!settingsContext.loadFloat(espRangeInMetersId, _espRangeInMeters)) {
+            _espRangeInMeters = 100.0f;
         }
     }
 
@@ -222,8 +226,8 @@ public:
         settingsContext.set(glowTransparentLevelId, _glowTransparentLevel);
         settingsContext.set(glowBorderId, _glowBorder);
 
-        settingsContext.set(drawHitboxPositionId, _drawHitboxPosition);
-        settingsContext.set(hitboxRangeInMetersId, _hitboxRangeInMeters);
+        settingsContext.set(espEnabledId, _espEnabled);
+        settingsContext.set(espRangeInMetersId, _espRangeInMeters);
     }
 };
 //glowTransparentLevelId
@@ -239,5 +243,5 @@ const std::string EspSettings::glowMinHealthColorId = "esp.glowMinHealthColor";
 const std::string EspSettings::glowTransparentLevelId = "esp.glowTransparentLevel";
 const std::string EspSettings::glowBorderId = "esp.glowBorderId";
 
-const std::string EspSettings::drawHitboxPositionId = "esp.drawHitboxPosition";
-const std::string EspSettings::hitboxRangeInMetersId = "esp.hitboxRangeInMeters";
+const std::string EspSettings::espEnabledId = "esp.espEnabled";
+const std::string EspSettings::espRangeInMetersId = "esp.espRangeInMeters";

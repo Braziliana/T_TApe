@@ -3,6 +3,7 @@
 #include "../imgui/imgui.h"
 #include <algorithm>
 #include "../Math/Color.hpp"
+#include "../Math/Vector2d.hpp"
 
 class Renderer
 {
@@ -10,21 +11,36 @@ private:
 
 public:
 
-    static void drawRectangleOutline(float x, float y, float width, float height, float r, float g, float b, float lineWidth) {
-
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    static void drawRectangleOutline(Vector2d position, Vector2d size, Color color, float lineWidth) {
 
         glLineWidth(lineWidth);
-        glColor3f(r, g, b);
+        glColor3f(color.r, color.g, color.b);
 
-        glBegin(GL_QUADS);
-            glVertex2f(x, y);
-            glVertex2f(x + width, y);
-            glVertex2f(x + width, y + height);
-            glVertex2f(x, y + height);
+        glBegin(GL_LINE_LOOP);
+            glVertex2f(position.x, position.y);
+            glVertex2f(position.x + size.x, position.y);
+            glVertex2f(position.x + size.x, position.y + size.y);
+            glVertex2f(position.x, position.y + size.y);
         glEnd();
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glLineWidth(1.0f);
+    }
+
+    static void drawFilledRectagle(Vector2d position, Vector2d size, Color color) {
+
+        glColor3f(color.r, color.g, color.b);
+        glBegin(GL_QUADS);
+            glVertex2f(position.x, position.y);
+            glVertex2f(position.x + size.x, position.y);
+            glVertex2f(position.x + size.x, position.y + size.y);
+            glVertex2f(position.x, position.y + size.y);
+        glEnd();
+    }
+
+    static void drawBorderedFillRectangle(Vector2d position, Vector2d size, Color fillColor, Color borderColor, float lineWidth, float fill) {
+        drawFilledRectagle(position, Vector2d(size.x, size.y), Color(0, 0, 0));
+        drawFilledRectagle(position, Vector2d(size.x * fill, size.y), fillColor);
+        drawRectangleOutline(position, size, borderColor, lineWidth);
     }
 
     static bool renderImguiFloatValue(std::string label, std::string id, float* value, float min, float max, float slowStep, float fastStep) {

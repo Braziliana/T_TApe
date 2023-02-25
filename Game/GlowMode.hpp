@@ -48,4 +48,11 @@ public:
     GlowMode() : generalGlowMode(HighlightFill::CustomColor), borderGlowMode(HighlightOutline::CustomColor), borderSize(0), transparentLevel(0) { }
     GlowMode(HighlightFill generalGlowMode, HighlightOutline borderGlowMode, byte borderSize, byte transparentLevel) :
         generalGlowMode(generalGlowMode), borderGlowMode(borderGlowMode), borderSize(borderSize), transparentLevel(transparentLevel) { }
+
+    bool operator==(const GlowMode& other) const {
+        return generalGlowMode == other.generalGlowMode &&
+            borderGlowMode == other.borderGlowMode &&
+            borderSize == borderSize &&
+            transparentLevel == transparentLevel;
+    }
 };

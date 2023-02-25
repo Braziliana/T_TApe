@@ -34,11 +34,6 @@ public:
     ulong viewRender = 0x7677288; //[Miscellaneous] ViewRender=0x7677288
     ulong viewMatrix = 0x11a210; //[Miscellaneous] ViewMatrix=0x11a210
 
-    /*
-    CPlayer!camera_origin=0x1f48
-CPlayer!camera_angles=0x1f54
-    */
-
     ulong lifeState = 0x0798; //m_lifeState=0x0798
     ulong bleedOutState = 0x2740; //m_bleedoutState=0x2740
     ulong health = 0x043c; //[RecvTable.DT_Player] m_iHealth=0x043c
@@ -55,6 +50,7 @@ CPlayer!camera_angles=0x1f54
     ulong bones = 0x0e98 + 0x48; //m_bConstrainBetweenEndpoints=0x0f50
     ulong studioHdr = 0x10f0; //CBaseAnimating!m_pStudioHdr=0x10f0
     ulong cameraPosition = 0x1f48; //[Miscellaneous] CPlayer!camera_origin=0x1f48
+    ulong name = 0x0589; //[RecvTable.DT_BaseEntity] m_iName
 
     ulong highlightServerContextID = 0x03c0; //[RecvTable.DT_HighlightSettings] m_highlightServerContextID=0x03c0
     ulong glowEnable = 0x008;
@@ -65,5 +61,7 @@ CPlayer!camera_angles=0x1f54
 
     ulong highlightFunctionBits=0x02c0; // [RecvTable.DT_HighlightSettings] m_highlightFunctionBits=0x02c0
     ulong glowMode = 0x0004;
-
+    
+    ulong highlightServerFadeEndTimes = 0x0380;
+    ulong glowDistance = 0x34; // [RecvTable.DT_HighlightSettings]m_highlightServerFadeEndTimes + 52(0x34);
 };

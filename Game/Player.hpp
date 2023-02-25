@@ -33,6 +33,12 @@ private:
     Vector3d _position;
     Vector3d _vecAbsOrigin;
     Vector3d _aimBonePosition;
+    Vector3d _headPosition;
+
+    GlowMode _glowMode;
+    Color _glowColor;
+    byte _glowEnabled;
+    byte _glowThroughWall;
 
     ulong readBasePointer() const {
         ulong ptr = Offsets::getInstance().region + Offsets::getInstance().entityList + ((_index + 1) << 5);
@@ -88,7 +94,7 @@ private:
         ulong ptr = _basePointer + Offsets::getInstance().vecAbsOrigin;
         return Memory::getInstance().read<Vector3d>(ptr);  
     }
-    
+
     int readBoneFromHitBox(HitboxType hitBox) const {
 
         ulong modelPtr = Memory::getInstance().read<ulong>(_basePointer + Offsets::getInstance().studioHdr);
@@ -117,7 +123,7 @@ private:
         return Memory::getInstance().read<uint16_t>(bonePtr);
     }
     
-    Vector3d readBonePosition(HitboxType hitBox) {
+    Vector3d readBonePosition(HitboxType hitBox) const {
         Vector3d offset = Vector3d(1.5f, 0.0f, 0.0f);
 
         int bone = readBoneFromHitBox(hitBox);
@@ -146,6 +152,36 @@ private:
         return bonePosition;
     }
 
+    Vector3d readHeadPosition() {
+        return readBonePosition(HitboxType::Head);
+    }
+
+    GlowMode readGlowMode() const {
+        ulong ptr = _basePointer + Offsets::getInstance().glowMode;
+        return Memory::getInstance().read<GlowMode>(ptr);  
+    }
+
+    Color readGlowColor() const {
+        ulong ptr = _basePointer + Offsets::getInstance().glowColor;
+        return Memory::getInstance().read<Color>(ptr);  
+    }
+
+    byte readGlowEnabled() const {
+        ulong ptr = _basePointer + Offsets::getInstance().glowEnable;
+        return Memory::getInstance().read<byte>(ptr);  
+    }
+
+    byte readGlowThroughWall() const {
+        ulong ptr = _basePointer + Offsets::getInstance().glowThroughWall;
+        return Memory::getInstance().read<byte>(ptr);  
+    }
+
+    int readNamePtr() {
+        ulong ptr = _basePointer + Offsets::getInstance().name;
+        return Memory::getInstance().read<int>(ptr);  
+    }
+    
+
 public:
 
     Player(int index) : _index(index), _basePointer(0) {
@@ -168,6 +204,11 @@ public:
         _position = Vector3d::zero();
         _vecAbsOrigin = Vector3d::zero();
         _aimBonePosition = Vector3d::zero();
+        _headPosition = Vector3d::zero();
+        _glowMode = GlowMode(HighlightFill::FillNone, HighlightOutline::FillNone, 0, 0);
+        _glowColor = Color(0, 0, 0);
+        _glowEnabled = 2;
+        _glowThroughWall = 5;
     }
 
     void update() {
@@ -191,11 +232,26 @@ public:
             return;
         }
 
+        if(readNamePtr() == 0) {
+            setAsInvalid();
+            return;
+        }
+
         _isKnocked = readIsKnocked();
 
         _health = readHealth();
+        if(_health <= 0 || _health > 300 ) {
+            setAsInvalid();
+            return;
+        }
         _maxHealth = readMaxHealth();
         _shield = readShield();
+
+        if(_health <= 0 || _health > 1000 ) {
+            setAsInvalid();
+            return;
+        }
+        
         _maxShield = readMaxShield();
 
         _isAlive = !_isDead && !_isKnocked && _health > 0 && _health <= 100;
@@ -207,10 +263,28 @@ public:
         _isVisible = _lastVisibleTime > _previouslastVisibleTime;
 
         _position = readPosition();
+
+        if(_position == Vector3d::zero()) {
+            setAsInvalid();
+            return;
+        }
+
         _vecAbsOrigin = readVecAbsOrigin();
+
+        _glowMode = readGlowMode();
+        _glowColor = readGlowColor();
+        _glowEnabled = readGlowEnabled();
+
+        if(_glowEnabled == 0 || _glowEnabled == 255) {
+            setAsInvalid();
+            return;
+        }
+
+        _glowThroughWall = readGlowThroughWall();
 
         HitboxType hitbox = Settings::getInstance().getAimbotSettings().getHitbox();
         _aimBonePosition = readBonePosition(hitbox);
+        _headPosition = readHeadPosition();
     }
 
     int getIndex() const {
@@ -278,11 +352,23 @@ public:
         return _position;
     }
 
+    Vector3d getVecAbsOrigin() const {
+        return _vecAbsOrigin;
+    }
+
     Vector3d getAimBonePosition() const {
         return _aimBonePosition;
     }
 
-    void setGlowState(byte enabled, byte throughWalls) const {
+    Vector3d getHeadPosition() const {
+        return _headPosition;
+    }
+
+    void setGlowState(byte enabled, byte throughWalls) {
+        if(_glowEnabled == enabled && _glowThroughWall == throughWalls) {
+            return;
+        }
+
         ulong glowEnablePtr = _basePointer + Offsets::getInstance().glowEnable;
         ulong glowThroughWallPtr = _basePointer + Offsets::getInstance().glowThroughWall;
 
@@ -292,9 +378,15 @@ public:
 
         Memory::getInstance().write(glowEnablePtr, enabled);
         Memory::getInstance().write(glowThroughWallPtr, throughWalls);
+        _glowEnabled = enabled;
+        _glowThroughWall = throughWalls;
     }
 
-    void setGlowColor(Color color) const {
+    void setGlowColor(Color color) {
+        if(_glowColor == color) {
+            return;
+        }
+
         ulong ptr = _basePointer + Offsets::getInstance().glowColor;
 
         if(!Memory::isValidPointer(ptr)) {
@@ -302,9 +394,14 @@ public:
         }
 
         Memory::getInstance().write(ptr, color);
+        _glowColor = color;
     }
 
-    void setGlowMode(GlowMode glowMode) const {
+    void setGlowMode(GlowMode glowMode) {
+        if(_glowMode == glowMode) {
+            return;
+        }
+
         ulong ptr = _basePointer + Offsets::getInstance().glowMode;
 
         if(!Memory::isValidPointer(ptr)) {
@@ -312,5 +409,6 @@ public:
         }
         
         Memory::getInstance().write(ptr, glowMode);
+        _glowMode = glowMode;
     }
 };

@@ -36,10 +36,7 @@ private:
             return false;
         }
 
-        if(player->isDead() ||
-            player->isKnocked() ||
-            !player->isEnemy() ||
-            !player->isInRange(settings.glowRangeInMeters())) {
+        if(player->isDead() || !player->isEnemy()) {
             return false;
         }
 
@@ -47,6 +44,31 @@ private:
     }
 
     float _lastUpdate = 0;
+
+    void enableGlow(Player* player, const EspSettings& settings) const {
+        
+        if(settings.getGlowType() == GlowType::BasicGlow) {
+            if(player->isVisible()) {
+                player->setGlowState(5, 1);
+            }
+            else {
+                player->setGlowState(7, 2);
+            }
+        }
+        else {
+            player->setGlowState(1, 2);
+            
+            if(settings.isGlowModeEnabled()) {
+                player->setGlowMode(GlowMode(HighlightFill::CustomColor, HighlightOutline::CustomColor, settings.getGlowBorder(), settings.getGlowTransparentLevel()));
+            }
+
+            player->setGlowColor(getGlowColor(player, settings).roundColor());
+        }
+    }
+
+    void disableGlow(Player* player) const {
+        player->setGlowState(2, 5);
+    }
 
 public:
     static Glow& getInstance() {
@@ -60,7 +82,7 @@ public:
     void update() {
         auto settings = Settings::getInstance().getEspSettings();
 
-        if(!settings.isGlowEnabled() || _lastUpdate + 0.5f > TimeManager::getInstance().getTime()){
+        if(!settings.isGlowEnabled() || _lastUpdate + 0.1f > TimeManager::getInstance().getTime()){
             return;
         }
 
@@ -68,11 +90,12 @@ public:
 
         for(auto player : PlayerManager::getInstance()) {
             if(isValidTarget(player, settings)) {
-                player->setGlowState(1, 1);
-                if(settings.isGlowModeEnabled()) {
-                    player->setGlowMode(GlowMode(HighlightFill::CustomColor, HighlightOutline::CustomColor, settings.getGlowBorder(), settings.getGlowTransparentLevel()));
+                if(player->isInRange(settings.glowRangeInMeters())) {
+                    enableGlow(player, settings);
                 }
-                player->setGlowColor(getGlowColor(player, settings));
+                else {
+                    disableGlow(player);
+                }
             }
         }
     }
