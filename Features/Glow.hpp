@@ -27,7 +27,7 @@ private:
             return Color::lerp(settings.getGlowMinHealthColor(), settings.getGlowMaxHealthColor(), (float)player->getHealth() / (float)player->getMaxHealth());
         }
 
-        return Color(255.0f, 255.0f, 255.0f);
+        return Color(1.0f, 1.0f, 1.0f);
     }
 
     bool isValidTarget(Player* player, EspSettings& settings) const {
@@ -70,7 +70,7 @@ public:
             if(isValidTarget(player, settings)) {
                 player->setGlowState(1, 2);
                 player->setGlowMode(GlowMode(HighlightFill::CustomColor, HighlightOutline::CustomColor, 46, 90));
-                player->setGlowColor(getGlowColor(player, settings));
+                player->setGlowColor(getGlowColor(player, settings).strenghten(settings.getGlowStrength()));
             }
         }
     }

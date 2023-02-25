@@ -48,6 +48,14 @@ public:
         b = std::clamp(b, 0.0f, 1.0f);
         return *this;
     }
+
+    Color strenghten(float value){
+        Color result = Color(r, g, b);
+        result.r * value;
+        result.g * value;
+        result.b * value;
+        return result;
+    }
 };
 
 const int Color::size = 3;
