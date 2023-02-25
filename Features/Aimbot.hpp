@@ -85,7 +85,7 @@ public:
 
         auto settings = Settings::getInstance().getAimbotSettings();
 
-        if (!LocalPlayer::getInstance().isInAttack() || (settings.useHotkey() && !InputManager::isKeyDownOrPress(settings.getAimHotkey())))
+        if ((!LocalPlayer::getInstance().isInAttack() && !settings.useHotkey()) || (settings.useHotkey() && !InputManager::isKeyDownOrPress(settings.getAimHotkey())))
         {
             _currentTarget = nullptr;
             return;
