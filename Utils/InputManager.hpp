@@ -241,20 +241,20 @@ public:
         closeDevices();
     }
 
-    static bool isKeyDownOrPress(short key) {
-        return _inputTypes[key] > 0;
+    static bool isKeyDownOrPress(InputKeyType key) {
+        return _inputTypes[static_cast<int>(key)] > 0;
     }
 
-    static bool isKeyDown(short key) {
-        return _inputTypes[key] == 1;
+    static bool isKeyDown(InputKeyType key) {
+        return _inputTypes[static_cast<int>(key)] == 1;
     }
 
-    static bool isKeyPress(short key) {
-        return _inputTypes[key] == 2;
+    static bool isKeyPress(InputKeyType key) {
+        return _inputTypes[static_cast<int>(key)] == 2;
     }
 
-    static bool isKeyUp(short key) {
-        return _inputTypes[key] == 0;
+    static bool isKeyUp(InputKeyType key) {
+        return _inputTypes[static_cast<int>(key)] == 0;
     }
 };
 

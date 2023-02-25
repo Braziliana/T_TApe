@@ -41,25 +41,13 @@ public:
         _glowEnabled(true),
         _glowType(GlowType::DynamicColorGlow),
         _glowRangeInMeters(1000),
-        _glowStaticColor(255.0f, 255.0f, 255.0f),
-        _glowMaxShieldColor(0.0f, 0.0f, 255.0f),
-        _glowMinShieldColor(255.0f, 255.0f, 255.0f),
-        _glowMaxHealthColor(0.0f, 255.0f, 0.0f),
-        _glowMinHealthColor(255.0f, 0.0f, 255.0f),
+        _glowStaticColor(1.0f, 1.0f, 1.0f),
+        _glowMaxShieldColor(0.0f, 0.0f, 1.0f),
+        _glowMinShieldColor(1.0f, 1.0f, 1.0f),
+        _glowMaxHealthColor(0.0f, 1.0f, 0.0f),
+        _glowMinHealthColor(1.0f, 0.0f, 0.0f),
         _drawHitboxPosition(false),
         _hitboxRangeInMeters(100) {}
-    
-    EspSettings(bool glow, float glowRangeInMeters, bool drawHitboxPosition, float hitboxRangeInMeters) :
-        _glowEnabled(glow),
-        _glowType(GlowType::DynamicColorGlow),
-        _glowRangeInMeters(glowRangeInMeters),
-        _glowStaticColor(255.0f, 255.0f, 255.0f),
-        _glowMaxShieldColor(0.0f, 0.0f, 255.0f),
-        _glowMinShieldColor(255.0f, 255.0f, 255.0f),
-        _glowMaxHealthColor(0.0f, 255.0f, 0.0f),
-        _glowMinHealthColor(255.0f, 0.0f, 255.0f),
-        _drawHitboxPosition(drawHitboxPosition),
-        _hitboxRangeInMeters(hitboxRangeInMeters) {}
 
     bool isGlowEnabled() const {
         return _glowEnabled;
@@ -107,6 +95,11 @@ public:
             ImGui::Checkbox("Glow##ESP", &_glowEnabled);
             Renderer::renderImguiFloatValue("Glow range in meters", "ESP", &_glowRangeInMeters, 25.0f, 10000.0f, 1.0f, 50.0f);
 
+            const char* glowTypes[] = { "DynamicColorGlow", "StaticColorGlow" };
+            int glowType = static_cast<int>(_glowType);
+            ImGui::Combo("Glow type##ESP", &glowType, glowTypes, IM_ARRAYSIZE(glowTypes));
+            _glowType = static_cast<GlowType>(glowType);
+
             if(_glowType == GlowType::DynamicColorGlow) {
                 Renderer::renderImguiColorValue("Glow max shield color", "ESP", _glowMaxShieldColor);
                 Renderer::renderImguiColorValue("Glow min shield color", "ESP", _glowMinShieldColor);
@@ -142,23 +135,23 @@ public:
         }
 
         if(!settingsContext.loadVector(glowStaticColorId, (float*)&_glowStaticColor, Color::size)) {
-            _glowStaticColor = Color(255.0f, 255.0f, 255.0f);
+            _glowStaticColor = Color(1.0f, 1.0f, 1.0f);
         }
 
         if(!settingsContext.loadVector(glowMaxShieldColorId, (float*)&_glowMaxShieldColor, Color::size)) {
-            _glowMaxShieldColor = Color(0.0f, 0.0f, 255.0f);
+            _glowMaxShieldColor = Color(0.0f, 0.0f, 1.0f);
         }
 
         if(!settingsContext.loadVector(glowMinShieldColorId, (float*)&_glowMinShieldColor, Color::size)) {
-            _glowMinShieldColor = Color(255.0f, 255.0f, 255.0f);
+            _glowMinShieldColor = Color(1.0f, 1.0f, 1.0f);
         }
 
         if(!settingsContext.loadVector(glowMaxHealthColorId, (float*)&_glowMaxHealthColor, Color::size)) {
-            _glowMaxHealthColor = Color(0.0f, 255.0f, 0.0f);
+            _glowMaxHealthColor = Color(0.0f, 1.0f, 0.0f);
         }
 
         if(!settingsContext.loadVector(glowMinHealthColorId, (float*)&_glowMinHealthColor, Color::size)) {
-            _glowMinHealthColor = Color(255.0f, 0.0f, 0.0f);
+            _glowMinHealthColor = Color(1.0f, 0.0f, 0.0f);
         }
 
         if(!settingsContext.loadBool(drawHitboxPositionId, _drawHitboxPosition)) {

@@ -6,6 +6,7 @@
 #include "../Game/TimeManager.hpp"
 #include "../Utils/Logger.hpp"
 #include "../Utils/InputManager.hpp"
+#include "../Utils/InputTypes.hpp"
 #include "Settings.hpp"
 #include "AimbotSettings.hpp"
 
@@ -84,7 +85,7 @@ public:
 
         auto settings = Settings::getInstance().getAimbotSettings();
 
-        if (!LocalPlayer::getInstance().isInAttack())
+        if (!LocalPlayer::getInstance().isInAttack() || (settings.useHotkey() && !InputManager::isKeyDownOrPress(settings.getAimHotkey())))
         {
             _currentTarget = nullptr;
             return;

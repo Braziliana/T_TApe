@@ -7,29 +7,14 @@ public:
 
     static const int size;
 
-    union {
-        struct { float r, g, b; };
-        float values[3];
-    };
+    float r;
+    float g;
+    float b;
 
-    Color() : r(255.0f), g(255.0f), b(255.0f) {}
+    Color() : r(1.0f), g(1.0f), b(1.0f) {}
 
     Color(float r, float g, float b) : r(r), g(g), b(b) {
         clamp();
-    }
-
-    Color(float* colorValues) {
-        values[0] = colorValues[0];
-        values[1] = colorValues[1];
-        values[2] = colorValues[2];
-    }
-
-    float& operator[](size_t index) {
-        return values[index];
-    }
-
-    const float& operator[](size_t index) const {
-        return values[index];
     }
 
     Color operator*(const float& scalar) const {
@@ -58,9 +43,9 @@ public:
     }
 
     Color& clamp() {
-        r = std::clamp(r, 0.0f, 255.0f);
-        g = std::clamp(g, 0.0f, 255.0f);
-        b = std::clamp(b, 0.0f, 255.0f);
+        r = std::clamp(r, 0.0f, 1.0f);
+        g = std::clamp(g, 0.0f, 1.0f);
+        b = std::clamp(b, 0.0f, 1.0f);
         return *this;
     }
 };

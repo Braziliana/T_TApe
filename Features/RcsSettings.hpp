@@ -15,14 +15,7 @@ private:
     float _horizontalPower;
 
 public:
-    RcsSettings() : _enabled(false), _verticalPower(0), _horizontalPower(0) {}
-    
-    RcsSettings(bool enabled, float verticalPower, float horizontalPower)
-    {
-        _enabled = enabled;
-        _verticalPower = verticalPower;
-        _horizontalPower = horizontalPower;
-    }
+    RcsSettings() : _enabled(false), _verticalPower(0.5f), _horizontalPower(0.5f) {}
 
     bool isEnabled() const {
         return _enabled;

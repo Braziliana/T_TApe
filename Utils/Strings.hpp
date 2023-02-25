@@ -27,7 +27,7 @@ std::string vectorToString(const float* vector, const int size) {
     ss << '(' << vector[0];
 
     for(int i = 1; i < size; i++) {
-        ss << ", " << vector[1];
+        ss << ", " << vector[i];
     }
 
     ss << ')';

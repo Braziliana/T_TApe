@@ -85,6 +85,7 @@ public:
                 color.r = imColor.x;
                 color.g = imColor.y;
                 color.b = imColor.z;
+                color.clamp();
             }
             ImGui::EndPopup();
         }

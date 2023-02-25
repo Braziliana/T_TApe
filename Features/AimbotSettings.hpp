@@ -4,6 +4,7 @@
 #include "../RenderEngine/Renderer.hpp"
 #include "../Game/Enums/HitboxType.hpp"
 #include "../Math/QAngle.hpp"
+#include "../Utils/InputTypes.hpp"
 
 struct AimbotSettings
 {
@@ -18,6 +19,8 @@ private:
     static const std::string hitboxId;
     static const std::string fieldOfViewId;
     static const std::string angleSmoothTypeId;
+    static const std::string useHotkeyId;
+    static const std::string aimHotkeyId;
 
     bool _enabled;
     bool _rage;
@@ -29,6 +32,8 @@ private:
     HitboxType _hitbox;
     float _fieldOfView;
     AngleSmoothType _angleSmoothType;
+    bool _useHotkey;
+    InputKeyType _aimHotkey;
 
 public:
     AimbotSettings() : _enabled(false),
@@ -39,18 +44,10 @@ public:
         _maxAngleChangePerTick(0.25f),
         _rangeInMeters(250.0f),
         _hitbox(HitboxType::UpperChest),
-        _fieldOfView(45.0f) {}
-    
-    AimbotSettings(bool enabled, bool rage, float verticalPower, float horizontalPower, float speed, float maxAngleChangePerTick, float rangeInMeters, HitboxType hitbox, float fieldOfView) : 
-        _enabled(enabled),
-        _rage(rage),
-        _verticalPower(verticalPower),
-        _horizontalPower(horizontalPower),
-        _speed(speed),
-        _maxAngleChangePerTick(maxAngleChangePerTick),
-        _rangeInMeters(rangeInMeters),
-        _hitbox(hitbox),
-        _fieldOfView(fieldOfView) {}
+        _fieldOfView(45.0f),
+        _angleSmoothType(AngleSmoothType::LerpSmoothing),
+        _useHotkey(false),
+        _aimHotkey(InputKeyType::INPUT_UNKNOWN) {}
 
     bool isEnabled() const {
         return _enabled;
@@ -92,6 +89,14 @@ public:
         return _angleSmoothType;
     }
 
+    bool useHotkey() const {
+        return _useHotkey;
+    }
+
+    InputKeyType getAimHotkey() const {
+        return _aimHotkey;
+    }
+
     void render()  {
         if(ImGui::BeginTabItem("Aimbot Settings")) {
 
@@ -124,6 +129,12 @@ public:
             if (ImGui::Combo("Angle smooth type##Aimbot", &angleSmoothTypeIndex, angleSmoothTypeNames, IM_ARRAYSIZE(angleSmoothTypeNames))) {
                 _angleSmoothType = static_cast<AngleSmoothType>(angleSmoothTypeIndex);
             }
+
+            ImGui::Checkbox("Use hotkey##Aimbot", &_useHotkey);
+
+            int aimHotkey = static_cast<int>(_aimHotkey);
+            ImGui::Combo("Aim hotkey##Aimbot", &aimHotkey, InputKeyTypeNames, IM_ARRAYSIZE(InputKeyTypeNames));
+            _aimHotkey = static_cast<InputKeyType>(aimHotkey);
 
             ImGui::EndTabItem();
         }
@@ -177,6 +188,18 @@ public:
         else {
             _angleSmoothType = AngleSmoothType::LerpSmoothing;
         }
+
+        if(!settingsContext.loadBool(useHotkeyId, _useHotkey)) {
+            _useHotkey = false;
+        }
+
+        int aimHotkey = 0;
+        if(settingsContext.loadInt(aimHotkeyId, aimHotkey)) {
+            _aimHotkey = static_cast<InputKeyType>(aimHotkey);
+        }
+        else {
+            _aimHotkey = InputKeyType::INPUT_UNKNOWN;
+        }
     }
 
     void save(SettingsContext& settingsContext) const {
@@ -190,6 +213,8 @@ public:
         settingsContext.set(hitboxId, static_cast<int>(_hitbox));
         settingsContext.set(fieldOfViewId, _fieldOfView);
         settingsContext.set(angleSmoothTypeId, static_cast<int>(_angleSmoothType));
+        settingsContext.set(useHotkeyId, _useHotkey);
+        settingsContext.set(aimHotkeyId, static_cast<int>(_aimHotkey));
     }
 };
 
@@ -203,3 +228,5 @@ const std::string AimbotSettings::rangeInMetersId = "aimbot.rangeInMeters";
 const std::string AimbotSettings::hitboxId = "aimbot.hitbox";
 const std::string AimbotSettings::fieldOfViewId = "aimbot.fieldOfView";
 const std::string AimbotSettings::angleSmoothTypeId = "aimbot.angleSmoothType";
+const std::string AimbotSettings::useHotkeyId = "aimbot.useHotkey";
+const std::string AimbotSettings::aimHotkeyId = "aimbot.aimHotkey";

@@ -26,9 +26,9 @@ private:
             internalLoad();
         }
         else {
-            _rcsSettings = RcsSettings(true, 0.75, 0.5);
-            _aimbotSettings = AimbotSettings(false, false, 1.0f, 1.0f, 5.0f, 0.25f, 250.0f, HitboxType::UpperChest, 45.0f);
-            _espSettings = EspSettings(true, 1000, false, 100);
+            _rcsSettings = RcsSettings();
+            _aimbotSettings = AimbotSettings();
+            _espSettings = EspSettings();
             _sleepIntervalMs = 10;
             save();
         }
