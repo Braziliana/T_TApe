@@ -85,11 +85,15 @@ public:
 
         auto settings = Settings::getInstance().getAimbotSettings();
 
+        if(!LocalPlayer::getInstance().isValid()) {
+            return;
+        }
+        
         if ((!LocalPlayer::getInstance().isInAttack() && !settings.useHotkey()) || (settings.useHotkey() && !InputManager::isKeyDownOrPress(settings.getAimHotkey())))
         {
             _currentTarget = nullptr;
             return;
-        }   
+        }
 
         Player* target = _currentTarget;
         if(!isValidTarget(target, settings))

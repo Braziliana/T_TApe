@@ -62,7 +62,7 @@ private:
             ie = {0};
             if(keyboardInputHandler.readEv(ie)) {  
                 _inputTypes[static_cast<int>(mapKeyboardKeyType(ie.code))] = ie.value;
-                //std::cout << (int)mapKeyboardKeyType(ie.code) << std::endl;
+                //std::cout << (int)mapKeyboardKeyType(ie.code) << " " << ie.value  << std::endl;
             }
         }
 
@@ -70,7 +70,7 @@ private:
             ie = {0};
             if(mouseInputHandler.readEv(ie)) {
                 _inputTypes[static_cast<int>(mapMouseButtonType(ie.code))] = ie.value;
-                //std::cout << (int)mapMouseButtonType(ie.code) << std::endl;
+                //std::cout << (int)mapMouseButtonType(ie.code) << " " << ie.value << std::endl;
             }
         }
     }

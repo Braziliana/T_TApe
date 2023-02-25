@@ -5,9 +5,11 @@
 #include <string>
 #include <map>
 #include <filesystem>
+#include <algorithm>
 
 #include "Strings.hpp"
 #include "Logger.hpp"
+#include "Types.hpp"
 
 class SettingsContext
 {
@@ -76,6 +78,19 @@ public:
         } 
 
         return "";
+    }
+
+    byte loadByte(const std::string& name, byte& value) const {
+        auto valueStr = loadString(name);
+
+        if(valueStr.empty()) {
+            value = 0;
+            return false;
+        }
+
+        int val = std::stoi(valueStr);
+        value = std::clamp(val, 0, 255);
+        return true;
     }
 
     bool loadInt(const std::string& name, int& value) const {

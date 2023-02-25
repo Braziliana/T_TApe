@@ -28,7 +28,7 @@ private:
     bool _glowEnabled;
     GlowType _glowType;
     float _glowRangeInMeters;
-    float _glowStrength;
+    byte _glowTransparentLevel;
     Color _glowStaticColor;
     Color _glowMaxShieldColor;
     Color _glowMinShieldColor;
@@ -43,7 +43,7 @@ public:
         _glowEnabled(true),
         _glowType(GlowType::DynamicColorGlow),
         _glowRangeInMeters(1000),
-        _glowStrength(3.0f),
+        _glowTransparentLevel(90),
         _glowStaticColor(1.0f, 1.0f, 1.0f),
         _glowMaxShieldColor(0.0f, 0.0f, 1.0f),
         _glowMinShieldColor(1.0f, 1.0f, 1.0f),
@@ -60,8 +60,8 @@ public:
         return _glowRangeInMeters;
     }
 
-    float getGlowStrength() const {
-        return _glowStrength;
+    float getGlowTransparentLevel() const {
+        return _glowTransparentLevel;
     }
 
     GlowType getGlowType() const {
@@ -101,9 +101,14 @@ public:
 
             ImGui::Checkbox("Glow##ESP", &_glowEnabled);
             Renderer::renderImguiFloatValue("Glow range in meters", "ESP", &_glowRangeInMeters, 25.0f, 10000.0f, 1.0f, 50.0f);
-            Renderer::renderImguiFloatValue("Glow strength", "ESP", &_glowStrength, 1.0f, 100.0f, 1.0f, 10.0f);
+            
+            int glowTransparentLevel = _glowTransparentLevel;
+            if(Renderer::renderImguiIntValue("Glow transparent level", "ESP", &glowTransparentLevel, 1.0, 255, 1, 10))
+            {
+                _glowTransparentLevel = std::clamp(glowTransparentLevel, 0, 255);
+            }
 
-            //_glowStrength
+            //_glowTransparentLevel
 
             const char* glowTypes[] = { "DynamicColorGlow", "StaticColorGlow" };
             int glowType = static_cast<int>(_glowType);
@@ -144,8 +149,8 @@ public:
             _glowRangeInMeters = 1000;
         }
 
-        if(!settingsContext.loadFloat(glowStrengthId, _glowStrength)) {
-            _glowStrength = 3.0f;
+        if(!settingsContext.loadByte(glowStrengthId, _glowTransparentLevel)) {
+            _glowTransparentLevel = 90;
         }
 
         if(!settingsContext.loadVector(glowStaticColorId, (float*)&_glowStaticColor, Color::size)) {
@@ -181,7 +186,7 @@ public:
         settingsContext.set(glowEnabledId, _glowEnabled);
         settingsContext.set(glowTypeId, static_cast<int>(_glowType));
         settingsContext.set(glowRangeInMetersId, _glowRangeInMeters);
-        settingsContext.set(glowStrengthId, _glowStrength);
+        settingsContext.set(glowStrengthId, _glowTransparentLevel);
         settingsContext.set(glowStaticColorId, (float*)&_glowStaticColor, Color::size);
         settingsContext.set(glowMaxShieldColorId, (float*)&_glowMaxShieldColor, Color::size);
         settingsContext.set(glowMinShieldColorId, (float*)&_glowMinShieldColor, Color::size);

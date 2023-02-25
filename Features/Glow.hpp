@@ -68,9 +68,9 @@ public:
 
         for(auto player : PlayerManager::getInstance()) {
             if(isValidTarget(player, settings)) {
-                player->setGlowState(1, 2);
-                player->setGlowMode(GlowMode(HighlightFill::CustomColor, HighlightOutline::CustomColor, 46, 90));
-                player->setGlowColor(getGlowColor(player, settings).strenghten(settings.getGlowStrength()));
+                player->setGlowState(1, 1);
+                player->setGlowMode(GlowMode(HighlightFill::CustomColor, HighlightOutline::CustomColor, 46, settings.getGlowTransparentLevel()));
+                player->setGlowColor(getGlowColor(player, settings));
             }
         }
     }
