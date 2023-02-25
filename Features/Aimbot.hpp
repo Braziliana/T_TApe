@@ -89,8 +89,7 @@ public:
             return;
         }
         
-        if ((!LocalPlayer::getInstance().isInAttack() && !settings.useHotkey()) || (settings.useHotkey() && !InputManager::isKeyDownOrPress(settings.getAimHotkey())))
-        {
+        if ((!LocalPlayer::getInstance().isInAttack() && !settings.useHotkey()) || (settings.useHotkey() && !InputManager::isKeyDownOrPress(settings.getAimHotkey()))) {
             _currentTarget = nullptr;
             return;
         }
@@ -110,7 +109,7 @@ public:
 
         Vector3d targePosition = target->getAimBonePosition();
 
-        if(targePosition.x == 0 && targePosition.y == 0 && targePosition.z == 0){
+        if(targePosition.x == 0 && targePosition.y == 0 && targePosition.z == 0) {
             return;
         }
 
