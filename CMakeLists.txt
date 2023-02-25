@@ -34,6 +34,7 @@ target_link_libraries(T_TApe
   X11
   Xinerama
   Xi
+  udev
 )
 
 # Set the include directories for the executable

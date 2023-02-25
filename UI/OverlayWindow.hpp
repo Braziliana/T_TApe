@@ -29,22 +29,10 @@ private:
         Logger::log(std::to_string(button));
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
-        if (action == GLFW_PRESS) {
-            InputManager::mouseButtonCallback(button, xpos, ypos, true);
-        }
-        else if (action == GLFW_RELEASE) {
-            InputManager::mouseButtonCallback(button, xpos, ypos, false);
-        }
     }
 
     static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
         Logger::log(std::to_string(key));
-        if (action == GLFW_PRESS) {         
-            InputManager::keyCallback(key, true);
-        }
-        else if (action == GLFW_RELEASE) {
-            InputManager::keyCallback(key, false);
-        }
     }
 
     static void glfwErrorCallback(int error, const char *description) {

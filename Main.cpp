@@ -109,14 +109,20 @@ int main(void)
     std::thread x11_thread(x11EventListener);
     x11_thread.detach();
 
+    std::thread inputManagerThread(InputManager::run);
+    inputManagerThread.detach();
+
     try {
         ow.run(&update, renderImgui);
     }
     catch(...) {
 
     }
+    
     stop_thread = true;
+    InputManager::stopThread = true;
     x11_thread.join();
+    inputManagerThread.join();
 
     return 0;
 }

@@ -2,184 +2,263 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <atomic>
+#include <chrono>
+#include <thread>
+#include <fcntl.h>
+#include <linux/input.h>
+#include <cstring>
+#include <libudev.h>
+#include <unistd.h>
+#include <cstdio>
+#include <stdlib.h>
+#include <string.h>
 
 #include "Logger.hpp"
+#include "InputTypes.hpp"
 
+#define test_bit(yalv, abs_b) ((((char *)abs_b)[yalv/8] & (1<<yalv%8)) > 0)
 
+struct InputDeviceHandler{
+private:
+    int _fd;
 
-enum class KeyboardKey : int {
-    Key_unknown = GLFW_KEY_UNKNOWN,
-    Key_space = GLFW_KEY_SPACE,
-    Key_apostrophe = GLFW_KEY_APOSTROPHE,
-    Key_comma = GLFW_KEY_COMMA,
-    Key_minus = GLFW_KEY_MINUS,
-    Key_period = GLFW_KEY_PERIOD,
-    Key_slash = GLFW_KEY_SLASH,
-    Key_0 = GLFW_KEY_0,
-    Key_1 = GLFW_KEY_1,
-    Key_2 = GLFW_KEY_2,
-    Key_3 = GLFW_KEY_3,
-    Key_4 = GLFW_KEY_4,
-    Key_5 = GLFW_KEY_5,
-    Key_6 = GLFW_KEY_6,
-    Key_7 = GLFW_KEY_7,
-    Key_8 = GLFW_KEY_8,
-    Key_9 = GLFW_KEY_9,
-    Key_semicolon = GLFW_KEY_SEMICOLON,
-    Key_equal = GLFW_KEY_EQUAL,
-    Key_a = GLFW_KEY_A,
-    Key_b = GLFW_KEY_B,
-    Key_c = GLFW_KEY_C,
-    Key_d = GLFW_KEY_D,
-    Key_e = GLFW_KEY_E,
-    Key_f = GLFW_KEY_F,
-    Key_g = GLFW_KEY_G,
-    Key_h = GLFW_KEY_H,
-    Key_i = GLFW_KEY_I,
-    Key_j = GLFW_KEY_J,
-    Key_k = GLFW_KEY_K,
-    Key_l = GLFW_KEY_L,
-    Key_m = GLFW_KEY_M,
-    Key_n = GLFW_KEY_N,
-    Key_o = GLFW_KEY_O,
-    Key_p = GLFW_KEY_P,
-    Key_q = GLFW_KEY_Q,
-    Key_r = GLFW_KEY_R,
-    Key_s = GLFW_KEY_S,
-    Key_t = GLFW_KEY_T,
-    Key_u = GLFW_KEY_U,
-    Key_v = GLFW_KEY_V,
-    Key_w = GLFW_KEY_W,
-    Key_x = GLFW_KEY_X,
-    Key_y = GLFW_KEY_Y,
-    Key_z = GLFW_KEY_Z,
-    Key_left_bracket = GLFW_KEY_LEFT_BRACKET,
-    Key_backslash = GLFW_KEY_BACKSLASH,
-    Key_right_bracket = GLFW_KEY_RIGHT_BRACKET,
-    Key_grave_accent = GLFW_KEY_GRAVE_ACCENT,
-    Key_world_1 = GLFW_KEY_WORLD_1,
-    Key_world_2 = GLFW_KEY_WORLD_2,
-    Key_escape = GLFW_KEY_ESCAPE,
-    Key_enter = GLFW_KEY_ENTER,
-    Key_tab = GLFW_KEY_TAB,
-    Key_backspace = GLFW_KEY_BACKSPACE,
-    Key_insert = GLFW_KEY_INSERT,
-    Key_delete = GLFW_KEY_DELETE,
-    Key_right = GLFW_KEY_RIGHT,
-    Key_left = GLFW_KEY_LEFT,
-    Key_down = GLFW_KEY_DOWN,
-    Key_up = GLFW_KEY_UP,
-    Key_page_up = GLFW_KEY_PAGE_UP,
-    Key_page_down = GLFW_KEY_PAGE_DOWN,
-    Key_home = GLFW_KEY_HOME,
-    Key_end = GLFW_KEY_END,
-    Key_caps_lock = GLFW_KEY_CAPS_LOCK,
-    Key_scroll_lock = GLFW_KEY_SCROLL_LOCK,
-    Key_num_lock = GLFW_KEY_NUM_LOCK,
-    Key_print_screen = GLFW_KEY_PRINT_SCREEN,
-    Key_pause = GLFW_KEY_PAUSE,
-    Key_f1 = GLFW_KEY_F1,
-    Key_f2 = GLFW_KEY_F2,
-    Key_f3 = GLFW_KEY_F3,
-    Key_f4 = GLFW_KEY_F4,
-    Key_f5 = GLFW_KEY_F5,
-    Key_f6 = GLFW_KEY_F6,
-    Key_f7 = GLFW_KEY_F7,
-    Key_f8 = GLFW_KEY_F8,
-    Key_f9 = GLFW_KEY_F9,
-    Key_f10 = GLFW_KEY_F10,
-    Key_f11 = GLFW_KEY_F11,
-    Key_f12 = GLFW_KEY_F12,
+public:
+    bool openDevice(const char* deviceName) {
+        _fd = open(deviceName, O_RDONLY | O_NONBLOCK);
+        if (_fd <= 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    void closeDevice() {
+        close(_fd);
+    }
+
+    bool readEv(input_event& ie) {
+        int bytes = read(_fd, &ie, sizeof(ie));
+        if (bytes > 0) {
+            if (ie.type & EV_KEY) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 };
-
-enum class MouseButton : int {
-    Button_1 = GLFW_MOUSE_BUTTON_1,
-    Button_2 = GLFW_MOUSE_BUTTON_2,
-    Button_3 = GLFW_MOUSE_BUTTON_3,
-    Button_4 = GLFW_MOUSE_BUTTON_4,
-    Button_5 = GLFW_MOUSE_BUTTON_5,
-    Button_6 = GLFW_MOUSE_BUTTON_6,
-    Button_7 = GLFW_MOUSE_BUTTON_7,
-    Button_8 = GLFW_MOUSE_BUTTON_8,
-    Button_Left = Button_1,
-    Button_Right = Button_2,
-    Button_Middle = Button_3
-};
-
-typedef void(*MouseActionFunc)(MouseButton button, double x, double y, bool press);
-typedef void(*KeyboardActionFunc)(KeyboardKey key, bool press);
 
 class InputManager {
-public:
- 
-    static bool isKeyDown(KeyboardKey key) {
-        return keys[static_cast<int>(key)] == GLFW_PRESS;
-    }
-
-    static bool isKeyUp(KeyboardKey key) {
-        return keys[static_cast<int>(key)] == GLFW_RELEASE;
-    }
-
-    static bool isMouseButtonUp(MouseButton button) {
-        return mouseButtons[static_cast<int>(button)] == GLFW_PRESS;
-    }
-
-    static bool isMouseButtonDown(MouseButton button) {
-        return mouseButtons[static_cast<int>(button)] == GLFW_RELEASE;
-    }
-
-    static void keyCallback(int key, bool press) {
-        if (key >= 0 && key < GLFW_KEY_LAST) {
-            keys[key] = press;
-
-            for(auto keyboardAction : keyboardActions) {
-                keyboardAction(static_cast<KeyboardKey>(key), press);
-            }
-
-        }
-    }
-
-    static void mouseButtonCallback(int button, double x, double y, bool press) {
-        if (button >= 0 && button < GLFW_MOUSE_BUTTON_LAST) {
-            mouseButtons[button] = press;
-
-            for(auto mouseAction : mouseActions) {
-                mouseAction(static_cast<MouseButton>(button), x, y, press);
-            }
-        }
-    }
-
-    static void registerMouseAction(MouseActionFunc mouseAction) {
-        if(mouseAction == nullptr) {
-            return;
-        }
-        
-        if (std::find(mouseActions.begin(), mouseActions.end(), mouseAction) == mouseActions.end()) {
-            mouseActions.push_back(mouseAction);
-        }
-    }
-
-    static void registerKeyboardAction(KeyboardActionFunc keyboardAction) {
-        if(keyboardAction == nullptr) {
-            return;
-        }
-        
-        if (std::find(keyboardActions.begin(), keyboardActions.end(), keyboardAction) == keyboardActions.end()) {
-            keyboardActions.push_back(keyboardAction);
-        }
-    }
-
 private:
+    static ushort _inputTypes[InputKeyTypeCount];
+    static std::vector<InputDeviceHandler> _keyboardInputHandlers;
+    static std::vector<InputDeviceHandler> _mouseInputHandlers;
 
-    static bool keys[GLFW_KEY_LAST];
-    static bool mouseButtons[GLFW_MOUSE_BUTTON_LAST];
+    static void readEv() {
+        input_event ie;
+        
+        for(auto keyboardInputHandler : _keyboardInputHandlers) {
+            ie = {0};
+            if(keyboardInputHandler.readEv(ie)) {  
+                _inputTypes[static_cast<int>(mapKeyboardKeyType(ie.code))] = ie.value;
+                //std::cout << (int)mapKeyboardKeyType(ie.code) << std::endl;
+            }
+        }
 
-    static std::vector<MouseActionFunc> mouseActions;
-    static std::vector<KeyboardActionFunc> keyboardActions;
+        for(auto mouseInputHandler : _mouseInputHandlers) {
+            ie = {0};
+            if(mouseInputHandler.readEv(ie)) {
+                _inputTypes[static_cast<int>(mapMouseButtonType(ie.code))] = ie.value;
+                //std::cout << (int)mapMouseButtonType(ie.code) << std::endl;
+            }
+        }
+    }
+
+    static void closeDevices() {
+        for(auto keyboardInputHandler : _keyboardInputHandlers) {
+            keyboardInputHandler.closeDevice();
+        }
+
+        for(auto mouseInputHandler : _mouseInputHandlers) {
+            mouseInputHandler.closeDevice();
+        }
+    }
+
+    static bool isValidInputDevice(const char* device) {
+        if(device == nullptr || std::string(device).find("event") == std::string::npos) {
+            return false;
+        }
+
+        int fd = open(device, O_RDONLY | O_NONBLOCK);
+        if (fd <= 0) {
+            return false;
+        }
+
+        unsigned char evtype_b[(EV_MAX + 7) / 8];
+        ioctl(fd, EVIOCGBIT(0, sizeof(evtype_b)), evtype_b);
+
+        close(fd);
+
+        if (!test_bit(EV_KEY, evtype_b)) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    static std::vector<std::string> listInputDevices(const char* deviceType) {
+        std::vector<std::string> result;
+
+        udev* udevContext = udev_new();
+        if (!udevContext) {
+            std::cerr << "Failed to create udev context" << std::endl;
+            return result;
+        }
+
+        udev_enumerate* udevEnumerate = udev_enumerate_new(udevContext);
+        if (!udevEnumerate) {
+            std::cerr << "Failed to create udev enumeration context\n";
+            udev_unref(udevContext);
+            return result;
+        }
+
+        udev_enumerate_add_match_subsystem(udevEnumerate, "input");
+        udev_enumerate_add_match_property(udevEnumerate, deviceType, "1");
+        udev_enumerate_scan_devices(udevEnumerate);
+
+        udev_list_entry* devicesList = udev_enumerate_get_list_entry(udevEnumerate);
+        udev_list_entry* device = nullptr;
+
+        udev_list_entry_foreach(device, devicesList) {
+            const char* path = udev_list_entry_get_name(device);
+            udev_device* dev = udev_device_new_from_syspath(udevContext, path);
+            if (dev) {
+                const char* devnode = udev_device_get_devnode(dev);
+                if (isValidInputDevice(devnode)) {
+                    result.push_back(std::string(devnode));
+                }
+                udev_device_unref(dev);
+            }
+        }
+
+        udev_enumerate_unref(udevEnumerate);
+        udev_unref(udevContext);
+
+        return result;
+    }
+
+    static void addKeyboardHandler(std::string device) {
+        InputDeviceHandler keyboardInputHandler;
+        if(!keyboardInputHandler.openDevice(device.c_str())) {
+            return;
+        }
+
+        std::cout << "Found keyboard device node: " << device << std::endl;
+        _keyboardInputHandlers.push_back(keyboardInputHandler);
+    }
+
+    static bool initKeyboard() {
+        
+        auto devices = listInputDevices("ID_INPUT_KEYBOARD");
+        
+        if(devices.empty()) {
+            return false;
+        }
+
+        for(auto device : devices) {
+            addKeyboardHandler(device);
+        }
+
+        if(_keyboardInputHandlers.empty()) {
+            std::cout << "Failed to find keyborad device. Input manager will not work." << std::endl;
+            return false;
+        }
+
+        return true;
+    }
+
+    static void addMouseHandler(std::string device) {
+        InputDeviceHandler mouseInputHandler;
+        if(!mouseInputHandler.openDevice(device.c_str())) {
+            return;
+        }
+
+        std::cout << "Found mouse device node: " << device << std::endl;
+        _mouseInputHandlers.push_back(mouseInputHandler);
+    }
+
+    static bool initMouse() {
+        
+        auto devices = listInputDevices("ID_INPUT_MOUSE");
+        
+        if(devices.empty()) {
+            return false;
+        }
+
+        for(auto device : devices) {
+            addMouseHandler(device);
+        }
+
+        if(_mouseInputHandlers.empty()) {
+            std::cout << "Failed to find mouse device. Input manager will not work." << std::endl;
+            return false;
+        }
+
+        return true;
+    }
+
+    static bool init() {
+        if(!initKeyboard()) {
+            return false;
+        }
+
+        if(!initMouse()) {
+            return false;
+        }
+
+        return true;
+    }
+
+public:
+
+    static std::atomic_bool stopThread;
+
+    static void run() {
+
+        if(!init())
+        {
+            std::cout << "Failed to init devices. Input manager will not work." << std::endl;
+            return;
+        }
+
+        while (!stopThread)
+        {
+            readEv();
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        }
+        
+        closeDevices();
+    }
+
+    static bool isKeyDownOrPress(short key) {
+        return _inputTypes[key] > 0;
+    }
+
+    static bool isKeyDown(short key) {
+        return _inputTypes[key] == 1;
+    }
+
+    static bool isKeyPress(short key) {
+        return _inputTypes[key] == 2;
+    }
+
+    static bool isKeyUp(short key) {
+        return _inputTypes[key] == 0;
+    }
 };
 
-bool InputManager::keys[GLFW_KEY_LAST] = {0};
-bool InputManager::mouseButtons[GLFW_MOUSE_BUTTON_LAST] = {0};
-
-std::vector<MouseActionFunc> InputManager::mouseActions = {};
-std::vector<KeyboardActionFunc> InputManager::keyboardActions = {};
+ushort InputManager::_inputTypes[InputKeyTypeCount] = {0};
+std::atomic_bool InputManager::stopThread(false);
+std::vector<InputDeviceHandler> InputManager::_keyboardInputHandlers = std::vector<InputDeviceHandler>();
+std::vector<InputDeviceHandler> InputManager::_mouseInputHandlers = std::vector<InputDeviceHandler>();
