@@ -78,15 +78,15 @@ public:
         return _sleepIntervalMs;
     }
 
-    EspSettings getEspSettings() const {
+    const EspSettings& getEspSettings() const {
         return _espSettings;
     }
 
-    RcsSettings getRcsSettings() const {
+    const RcsSettings& getRcsSettings() const {
         return _rcsSettings;
     };
 
-    AimbotSettings getAimbotSettings() const {
+    const AimbotSettings& getAimbotSettings() const {
         return _aimbotSettings;
     };
 

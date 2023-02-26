@@ -9,7 +9,8 @@
 #include "../Utils/InputTypes.hpp"
 #include "Settings.hpp"
 #include "AimbotSettings.hpp"
-
+#include "../Math/Predictor.hpp"
+#include <cmath>
 class Aimbot
 {
 private:
@@ -83,7 +84,7 @@ public:
 
     void update() {
 
-        auto settings = Settings::getInstance().getAimbotSettings();
+        const AimbotSettings& settings = Settings::getInstance().getAimbotSettings();
 
         if(!LocalPlayer::getInstance().isValid()) {
             return;
@@ -108,11 +109,12 @@ public:
         }
 
         Vector3d targePosition = target->getAimBonePosition();
-
         if(targePosition.x == 0 && targePosition.y == 0 && targePosition.z == 0) {
             return;
         }
-
+        
+        targePosition = predictTargetPosition(target, settings);
+        
         QAngle targetAngle = getAngle(targePosition, settings);
 
         if(!targetAngle.isValid()) {
@@ -120,6 +122,29 @@ public:
         }
         
         LocalPlayer::getInstance().setViewAngle(targetAngle);
+    }
+
+    Vector3d predictTargetPosition(Player* target, const AimbotSettings& settings) const {
+
+        Vector3d targePosition = target->getAimBonePosition();
+        auto weapon = LocalPlayer::getInstance().getWeapon();
+        if(weapon.isValid()) {
+            const Vector3d cameraPosition = LocalPlayer::getInstance().getCameraPosition();
+
+            float distance = cameraPosition.distanceTo(targePosition);
+            float projectileSpeed = weapon.getProjectileSpeed();
+            
+            Vector3d vAbs = target->getVecAbsVelocity();
+            if(distance > 1 && projectileSpeed > 1.0f && vAbs != Vector3d::zero())
+            {
+                float time = distance/projectileSpeed;
+                if(!std::isnan(time) || !std::isinf(time)) {
+                    targePosition = Predictor::predictPosition(targePosition, vAbs, distance/projectileSpeed, 1.0f);
+                }
+            }
+        }
+
+        return targePosition;
     }
 
     QAngle getAngle(const Vector3d& targePosition, const AimbotSettings& settings) const {
@@ -171,13 +196,5 @@ public:
 
         return currentAngle + angleChange;
     }
-
-
-    /*
-    
-     float bulletSpeed = curWeap.get_projectile_speed();
-    float bulletGravity = curWeap.get_projectile_gravity();
-    */
-   
 };
 

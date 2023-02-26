@@ -30,7 +30,7 @@ private:
         return Color(1.0f, 1.0f, 1.0f);
     }
 
-    bool isValidTarget(Player* player, EspSettings& settings) const {
+    bool isValidTarget(Player* player, const EspSettings& settings) const {
 
         if(player == nullptr || !player->isValid()) {
             return false;
@@ -80,7 +80,7 @@ public:
     Glow& operator=(const Glow&) = delete;
 
     void update() {
-        auto settings = Settings::getInstance().getEspSettings();
+        const EspSettings& settings = Settings::getInstance().getEspSettings();
 
         if(!settings.isGlowEnabled() || _lastUpdate + 0.1f > TimeManager::getInstance().getTime()){
             return;

@@ -11,7 +11,7 @@ private:
     Rcs() : _previousPunch(QAngle::zero()) {}
     ~Rcs() {}
 
-    void recoilControl(RcsSettings& settings, QAngle& weponPunch) const {
+    void recoilControl(const RcsSettings& settings, QAngle& weponPunch) const {
         QAngle playerAngle = LocalPlayer::getInstance().getViewAngle();
 
         QAngle punchValue = weponPunch - _previousPunch;
@@ -32,7 +32,7 @@ public:
     Rcs& operator=(const Rcs&) = delete;
 
     void update() {
-        auto settings = Settings::getInstance().getRcsSettings();
+        const RcsSettings& settings = Settings::getInstance().getRcsSettings();
         QAngle weponPunch = LocalPlayer::getInstance().getWeaponPunch();
 
         if(settings.isEnabled() && LocalPlayer::getInstance().isInAttack()) {

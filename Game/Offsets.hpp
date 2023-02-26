@@ -47,10 +47,12 @@ public:
     ulong team = 0x044c; //m_iTeamNum=0x044c
     ulong localOrigin = 0x0158; //m_localOrigin=0x0158
     ulong vecAbsOrigin = 0x014c; //m_vecAbsOrigin=0x014c
+    ulong vecAbsVelocity = 0x0140; //[RecvTable.DT_BaseEntity] m_vecAbsVelocity
     ulong bones = 0x0e98 + 0x48; //m_bConstrainBetweenEndpoints=0x0f50
     ulong studioHdr = 0x10f0; //CBaseAnimating!m_pStudioHdr=0x10f0
     ulong cameraPosition = 0x1f48; //[Miscellaneous] CPlayer!camera_origin=0x1f48
     ulong name = 0x0589; //[RecvTable.DT_BaseEntity] m_iName
+    ulong latestPrimaryWeapons = 0x1a1c; //[RecvTable.DT_BaseCombatCharacter] m_latestPrimaryWeapons
 
     ulong highlightServerContextID = 0x03c0; //[RecvTable.DT_HighlightSettings] m_highlightServerContextID=0x03c0
     ulong glowEnable = 0x008;
@@ -64,4 +66,26 @@ public:
     
     ulong highlightServerFadeEndTimes = 0x0380;
     ulong glowDistance = 0x34; // [RecvTable.DT_HighlightSettings]m_highlightServerFadeEndTimes + 52(0x34);
+
+    ulong projectileSpeed = 0x1f18; //CWeaponX!m_flProjectileSpeed=0x1f18
+    ulong projectileScale = 0x1f20; //CWeaponX!m_flProjectileScale=0x1f20
+    ulong ammoInClip = 0x1670;
+    //[RecvTable.DT_PropSurvival] m_customScriptInt=0x1648
+
+    /*
+    
+     
+[RecvTable.DT_WeaponX_LocalWeaponData]
+m_nNextThinkTick=0x0574
+m_lastPrimaryAttackTime=0x1644
+m_nextReadyTime=0x1648
+m_nextPrimaryAttackTime=0x164c
+m_attackTimeThisFrame=0x1650
+m_ammoInClip=0x1670
+m_ammoInStockpile=0x1674
+m_lifetimeShots=0x1678
+m_flTimeWeaponIdle=0x167c
+m_bInReload=0x1686
+    */
+
 };

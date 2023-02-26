@@ -32,6 +32,7 @@ private:
     bool _isVisible;
     Vector3d _position;
     Vector3d _vecAbsOrigin;
+    Vector3d _vecAbsVelocity;
     Vector3d _aimBonePosition;
     Vector3d _headPosition;
 
@@ -92,6 +93,11 @@ private:
 
     Vector3d readVecAbsOrigin() const {
         ulong ptr = _basePointer + Offsets::getInstance().vecAbsOrigin;
+        return Memory::getInstance().read<Vector3d>(ptr);  
+    }
+
+    Vector3d readVecAbsVelocity() const {
+        ulong ptr = _basePointer + Offsets::getInstance().vecAbsVelocity;
         return Memory::getInstance().read<Vector3d>(ptr);  
     }
 
@@ -203,6 +209,7 @@ public:
         _isVisible = false;
         _position = Vector3d::zero();
         _vecAbsOrigin = Vector3d::zero();
+        _vecAbsVelocity = Vector3d::zero();
         _aimBonePosition = Vector3d::zero();
         _headPosition = Vector3d::zero();
         _glowMode = GlowMode(HighlightFill::FillNone, HighlightOutline::FillNone, 0, 0);
@@ -270,6 +277,7 @@ public:
         }
 
         _vecAbsOrigin = readVecAbsOrigin();
+        _vecAbsVelocity = readVecAbsVelocity();
 
         _glowMode = readGlowMode();
         _glowColor = readGlowColor();
@@ -354,6 +362,10 @@ public:
 
     Vector3d getVecAbsOrigin() const {
         return _vecAbsOrigin;
+    }
+
+    Vector3d getVecAbsVelocity() const {
+        return _vecAbsVelocity;
     }
 
     Vector3d getAimBonePosition() const {

@@ -81,7 +81,7 @@ public:
     Esp& operator=(const Esp&) = delete;
 
     void render() const {
-        auto settings = Settings::getInstance().getEspSettings();
+        const EspSettings& settings = Settings::getInstance().getEspSettings();
 
         if(!settings.isEspEnabled()) {
             return;

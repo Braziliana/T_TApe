@@ -2,6 +2,7 @@
 #include "../Utils/Memory.hpp"
 #include "../Math/QAngle.hpp"
 #include "Offsets.hpp"
+#include "Weapon.hpp"
 
 class LocalPlayer
 {
@@ -20,51 +21,56 @@ private:
     QAngle _weaponPunch;
     QAngle _breathAngles;
     QAngle _viewAngle;
+    Weapon _weapon;
 
-    ulong ReadBasePointer()
-    {
+    ulong readBasePointer() const {
         long ptr = Offsets::getInstance().region + Offsets::getInstance().localPlayer;
         return Memory::getInstance().read<ulong>(ptr);
     }
 
-    int readTeam() {
+    int readTeam() const {
         ulong ptr = _basePointer + Offsets::getInstance().team;
         return Memory::getInstance().read<int>(ptr);  
     }
 
-    Vector3d readPosition() {
+    Vector3d readPosition() const {
         ulong ptr = _basePointer + Offsets::getInstance().localOrigin;
         return Memory::getInstance().read<Vector3d>(ptr);  
     }
 
-    bool readIsInAttack() {
+    bool readIsInAttack() const {
         long ptr = Offsets::getInstance().region + Offsets::getInstance().inAttack;
         return Memory::getInstance().read<short>(ptr) > 0;
     }
 
-    QAngle readWeaponPunch() {
+    QAngle readWeaponPunch() const {
         ulong ptr = _basePointer + Offsets::getInstance().weaponPunch;
         return Memory::getInstance().read<QAngle>(ptr);
     }
 
-    QAngle readBreathAngles() {
+    QAngle readBreathAngles() const {
         ulong ptr = _basePointer + Offsets::getInstance().breathAngles;
         return Memory::getInstance().read<QAngle>(ptr);
     }
 
-    QAngle readViewAngle() {
+    QAngle readViewAngle() const {
         ulong ptr = _basePointer + Offsets::getInstance().viewAngle;
         return Memory::getInstance().read<QAngle>(ptr).fixAngle();
     }
 
-    void writeViewAngle(QAngle viewAngle) {
+    void writeViewAngle(QAngle viewAngle) const {
         ulong ptr = _basePointer + Offsets::getInstance().viewAngle;
         Memory::getInstance().write(ptr, viewAngle);
     }
 
-    Vector3d readCameraPosition() {
+    Vector3d readCameraPosition() const {
         ulong ptr = _basePointer + Offsets::getInstance().cameraPosition;
         return Memory::getInstance().read<Vector3d>(ptr);
+    }
+
+    ulong readWeaponIndex() const {
+        ulong ptr = _basePointer + Offsets::getInstance().latestPrimaryWeapons;
+        return Memory::getInstance().read<ulong>(ptr) & 0xFFFF;
     }
 
     void setAsInvalid() {
@@ -88,7 +94,7 @@ public:
     LocalPlayer& operator=(const LocalPlayer&) = delete;
 
     void update() {
-        _basePointer = ReadBasePointer();
+        _basePointer = readBasePointer();
         _isValid = Memory::isValidPointer(_basePointer);
         if(!_isValid) {
             setAsInvalid();
@@ -102,6 +108,7 @@ public:
         _weaponPunch = readWeaponPunch();
         _breathAngles = readBreathAngles();
         _viewAngle = readViewAngle();
+        _weapon.update(readWeaponIndex());
     }
 
     ulong getBasePointer() const {
@@ -148,5 +155,9 @@ public:
         viewAngle.fixAngle();
         _viewAngle = viewAngle;
         writeViewAngle(viewAngle);
+    }
+
+    const Weapon& getWeapon() const {
+        return _weapon;
     }
 };

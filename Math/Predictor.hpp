@@ -7,19 +7,15 @@ class Predictor
 private:
 
 public:
-    // Vector3d PredictBulletDrop(const Vector3d& startPosition, const Vector3d& targetPosition, const float& bullerSpeed, const float& bulletDrop) {
-        
-    //     float y0 = startPosition.y;
-    //     float y1 = targetPosition.y;
 
-    //     double v0x = v0 * cos(theta);
-    //     double v0y = v0 * sin(theta);
-    //     double t_flight = x / v0x; // time of flight
-    //     double drop = 0.5 * g * t_flight * t_flight; // drop of the bullet during flight
-    //     double aim_point = y + drop; 
+    static Vector3d predictPosition(const Vector3d& startPosition, const Vector3d& velocityVector, const float& time, const float& precision) {
+        return startPosition + (velocityVector * time) * precision;
+    }
 
-    //     return targetPosition;
-    // }    
+    static float predictBulletDrop(const Vector3d& startPosition, const Vector3d& targetPosition, const float& bulletSpeed, const float& bulletDropRate) {
+        float distance = startPosition.distanceTo(targetPosition);
+        return (bulletDropRate / 2) * (distance * distance) / (bulletSpeed * bulletSpeed);
+    }
 
     // QAngle predict(Vector3d start_pos, Vector3d target_pos, float projectile_speed, float gravity) {
     //     Vector3d delta_pos = target_pos - start_pos;
@@ -48,4 +44,41 @@ public:
     //     yaw_rad = std::atan2(delta_z, delta_x);
     //     return QAngle(yaw_rad * 180.0 / M_PI, pitch_rad * 180.0 / M_PI);
     // }
+
+    /*
+
+        Vector3 position(0, 0, 0);
+        Vector3 target(10, 5, 20);
+        float bullet_speed = 100.0f;
+        float bullet_gravity = 9.81f;
+
+        float pitch, yaw;
+        CalculateTrajectory(position, target, bullet_speed, bullet_gravity, pitch, yaw);
+    
+    */
+
+    // void CalculateTrajectory(Vector3d position, Vector3d target, float speed, float gravity, float& out_pitch, float& out_yaw) {
+    //     Vector3d direction = (target - position).Normalized();
+    //     float distance = (target - position).Magnitude();   
+    //     float time = distance / speed;
+    //     float height = position.y - target.y;
+    //     float vertical_speed = (height + 0.5f * gravity * time * time) / time;
+    //     Vector3d horizontal_direction(direction.x, 0.0f, direction.z);
+    //     float horizontal_speed = speed / horizontal_direction.Magnitude();
+    //     out_pitch = -atan2(vertical_speed, horizontal_speed);
+    //     out_yaw = atan2(-direction.x, -direction.z);
+    // }
+
+    // void CalculateTrajectory(Vector3d position, Vector3d target, float speed, float gravity, float& out_pitch, float& out_yaw) {
+    //     Vector3d direction(target.y - position.y, position.x - target.x, target.z - position.z);
+    //     float distance = sqrt(direction.x * direction.x + direction.z * direction.z);
+    //     float time = distance / speed;
+    //     float height = position.z - target.z;
+    //     float vertical_speed = (height + 0.5f * gravity * time * time) / time;
+    //     Vector3d horizontal_direction(-direction.y, direction.x, 0.0f);
+    //     float horizontal_speed = speed / sqrt(horizontal_direction.x * horizontal_direction.x + horizontal_direction.y * horizontal_direction.y);
+    //     out_pitch = atan2(direction.z, distance);
+    //     out_yaw = atan2(vertical_speed, horizontal_speed);
+    // }
+
 };
