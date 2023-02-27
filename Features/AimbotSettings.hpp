@@ -21,6 +21,12 @@ private:
     static const std::string angleSmoothTypeId;
     static const std::string useHotkeyId;
     static const std::string aimHotkeyId;
+    static const std::string predictMovementEnabledId;
+    static const std::string predictMovementFactorId;
+    static const std::string predictBulletDropEnabledId;
+    static const std::string predictBulletDropFactorId;
+
+    static const std::string allowForTargetSwitchId;
 
     bool _enabled;
     bool _rage;
@@ -34,6 +40,11 @@ private:
     AngleSmoothType _angleSmoothType;
     bool _useHotkey;
     InputKeyType _aimHotkey;
+    bool _predictMovementEnabled;
+    float _predictMovementFactor;
+    bool _predictBulletDropEnabled;
+    float _predictBulletDropFactor;
+    bool _allowForTargetSwitch;
 
 public:
     AimbotSettings() : _enabled(false),
@@ -47,7 +58,12 @@ public:
         _fieldOfView(45.0f),
         _angleSmoothType(AngleSmoothType::LerpSmoothing),
         _useHotkey(false),
-        _aimHotkey(InputKeyType::INPUT_UNKNOWN) {}
+        _aimHotkey(InputKeyType::MOUSE_X1),
+        _predictMovementEnabled(false),
+        _predictMovementFactor(0.75f),
+        _predictBulletDropEnabled(false),
+        _predictBulletDropFactor(0.75f),
+        _allowForTargetSwitch(true) {}
 
     bool isEnabled() const {
         return _enabled;
@@ -97,6 +113,26 @@ public:
         return _aimHotkey;
     }
 
+    bool predictMovementEnabled() const {
+        return _predictMovementEnabled;
+    }
+
+    float getPredictMovementFactor() const {
+        return _predictMovementFactor;
+    }
+
+    bool predictBulletDropEnabled() const {
+        return _predictBulletDropEnabled;
+    }
+
+    float getPredictBulletDropFactor() const {
+        return _predictBulletDropFactor;
+    }
+
+    bool allowForTargetSwitch() const {
+        return _allowForTargetSwitch;
+    }
+
     void render()  {
         if(ImGui::BeginTabItem("Aimbot Settings")) {
 
@@ -135,6 +171,15 @@ public:
             int aimHotkey = static_cast<int>(_aimHotkey);
             ImGui::Combo("Aim hotkey##Aimbot", &aimHotkey, InputKeyTypeNames, IM_ARRAYSIZE(InputKeyTypeNames));
             _aimHotkey = static_cast<InputKeyType>(aimHotkey);
+
+            ImGui::Checkbox("Predict movement##Aimbot", &_predictMovementEnabled);
+            Renderer::renderImguiFloatValue("Predict movement factor", "Aimbot", &_predictMovementFactor, 0.1f, 2.0f, 0.05f, 0.1f);
+
+            ImGui::Checkbox("Predict bullet drop##Aimbot", &_predictBulletDropEnabled);
+            Renderer::renderImguiFloatValue("Predict bullet drop factor", "Aimbot", &_predictBulletDropFactor, 0.1f, 2.0f, 0.05f, 0.1f);
+
+
+            ImGui::Checkbox("Allow for target switch##Aimbot", &_allowForTargetSwitch);
 
             ImGui::EndTabItem();
         }
@@ -200,6 +245,26 @@ public:
         else {
             _aimHotkey = InputKeyType::INPUT_UNKNOWN;
         }
+
+        if(!settingsContext.loadBool(predictMovementEnabledId, _predictMovementEnabled)) {
+            _predictMovementEnabled = true;
+        }
+
+        if(!settingsContext.loadFloat(predictMovementFactorId, _predictMovementFactor)) {
+            _predictMovementFactor = 0.75f;
+        }
+
+        if(!settingsContext.loadBool(predictBulletDropEnabledId, _predictBulletDropEnabled)) {
+            _predictBulletDropEnabled = false;
+        }
+
+        if(!settingsContext.loadFloat(predictBulletDropFactorId, _predictBulletDropFactor)) {
+            _predictBulletDropFactor = 0.75f;
+        }
+
+        if(!settingsContext.loadBool(allowForTargetSwitchId, _allowForTargetSwitch)) {
+            _allowForTargetSwitch = false;
+        }
     }
 
     void save(SettingsContext& settingsContext) const {
@@ -215,6 +280,11 @@ public:
         settingsContext.set(angleSmoothTypeId, static_cast<int>(_angleSmoothType));
         settingsContext.set(useHotkeyId, _useHotkey);
         settingsContext.set(aimHotkeyId, static_cast<int>(_aimHotkey));
+        settingsContext.set(predictMovementEnabledId, _predictMovementEnabled);
+        settingsContext.set(predictMovementFactorId, _predictMovementFactor);
+        settingsContext.set(predictBulletDropEnabledId, _predictBulletDropEnabled);
+        settingsContext.set(predictBulletDropFactorId, _predictBulletDropFactor);
+        settingsContext.set(allowForTargetSwitchId, _allowForTargetSwitch);
     }
 };
 
@@ -230,3 +300,8 @@ const std::string AimbotSettings::fieldOfViewId = "aimbot.fieldOfView";
 const std::string AimbotSettings::angleSmoothTypeId = "aimbot.angleSmoothType";
 const std::string AimbotSettings::useHotkeyId = "aimbot.useHotkey";
 const std::string AimbotSettings::aimHotkeyId = "aimbot.aimHotkey";
+const std::string AimbotSettings::predictMovementEnabledId = "aimbot.predictMovementEnabled";
+const std::string AimbotSettings::predictMovementFactorId = "aimbot.predictMovementFactor";
+const std::string AimbotSettings::predictBulletDropEnabledId = "aimbot.predictBulletDropEnabled";
+const std::string AimbotSettings::predictBulletDropFactorId = "aimbot.predictBulletDropFactor";
+const std::string AimbotSettings::allowForTargetSwitchId = "aimbot.allowForTargetSwitch";

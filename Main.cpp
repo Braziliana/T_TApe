@@ -100,7 +100,7 @@ int main(void)
     }
 
     Logger::clear();
-    Logger::log("T_T Ape 1.1.1");
+    Logger::log("T_T Ape 1.1.7");
 
     if(!init()) {
         return -1;

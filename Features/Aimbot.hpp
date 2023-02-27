@@ -16,8 +16,9 @@ class Aimbot
 private:
 
     Player* _currentTarget;
+    bool _targetSelected;
 
-    Aimbot() {}
+    Aimbot() : _targetSelected(0), _currentTarget(nullptr) {}
     ~Aimbot() {}
 
     bool isValidTarget(Player* player, const AimbotSettings& settings) const {
@@ -87,17 +88,23 @@ public:
         const AimbotSettings& settings = Settings::getInstance().getAimbotSettings();
 
         if(!LocalPlayer::getInstance().isValid()) {
+            _targetSelected = false;
             return;
         }
         
         if ((!LocalPlayer::getInstance().isInAttack() && !settings.useHotkey()) || (settings.useHotkey() && !InputManager::isKeyDownOrPress(settings.getAimHotkey()))) {
             _currentTarget = nullptr;
+            _targetSelected = false;
             return;
         }
 
         Player* target = _currentTarget;
         if(!isValidTarget(target, settings))
         {
+            if(_targetSelected && !settings.allowForTargetSwitch()) {
+                return;
+            }
+
             target = findBestTarget(settings);
             if(!isValidTarget(target, settings))
             {
@@ -106,6 +113,7 @@ public:
             }
             
             _currentTarget = target;
+            _targetSelected = true;
         }
 
         Vector3d targePosition = target->getAimBonePosition();
@@ -114,7 +122,7 @@ public:
         }
         
         targePosition = predictTargetPosition(target, settings);
-        
+
         QAngle targetAngle = getAngle(targePosition, settings);
 
         if(!targetAngle.isValid()) {
@@ -125,21 +133,49 @@ public:
     }
 
     Vector3d predictTargetPosition(Player* target, const AimbotSettings& settings) const {
-
+        
         Vector3d targePosition = target->getAimBonePosition();
         auto weapon = LocalPlayer::getInstance().getWeapon();
-        if(weapon.isValid()) {
-            const Vector3d cameraPosition = LocalPlayer::getInstance().getCameraPosition();
 
+        if(!weapon.isValid()) {
+            return targePosition;
+        }
+
+        bool predictMovement = settings.predictMovementEnabled();
+        bool predictProjectileDrop = settings.predictBulletDropEnabled();
+
+        if(predictMovement || predictProjectileDrop) {
+
+            const Vector3d cameraPosition = LocalPlayer::getInstance().getCameraPosition();
             float distance = cameraPosition.distanceTo(targePosition);
+
+            if(distance < 1.0f) {
+                return targePosition;
+            }
+
             float projectileSpeed = weapon.getProjectileSpeed();
-            
-            Vector3d vAbs = target->getVecAbsVelocity();
-            if(distance > 1 && projectileSpeed > 1.0f && vAbs != Vector3d::zero())
-            {
-                float time = distance/projectileSpeed;
-                if(!std::isnan(time) || !std::isinf(time)) {
-                    targePosition = Predictor::predictPosition(targePosition, vAbs, distance/projectileSpeed, 1.0f);
+
+            if(projectileSpeed < 1.0f) {
+                return targePosition;
+            }
+
+            float timeToTarget = distance/projectileSpeed;
+
+            if(std::isnan(timeToTarget) || std::isinf(timeToTarget) || timeToTarget <= std::numeric_limits<float>::epsilon()) {
+                return targePosition;
+            }
+
+            if(predictMovement) {
+                Vector3d vAbs = target->getVecAbsVelocity();
+                if(vAbs != Vector3d::zero()) {
+                    targePosition = Predictor::predictPosition(targePosition, vAbs, timeToTarget, settings.getPredictMovementFactor());
+                }
+            }
+
+            if(predictProjectileDrop) {
+                float projectileGravity = weapon.getProjectileScale() * 700.0f; // * 750.0f;
+                if(projectileGravity > 0.0f) {
+                    targePosition.z += Predictor::predictBulletDrop(cameraPosition, targePosition, timeToTarget, projectileGravity) * settings.getPredictBulletDropFactor();
                 }
             }
         }

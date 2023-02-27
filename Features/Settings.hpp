@@ -107,7 +107,7 @@ public:
             return;
         }
 
-        ImGui::Begin("T_T Ape 1.1.5");
+        ImGui::Begin("T_T Ape 1.1.7");
         
         if (ImGui::BeginTabBar("Settings")) {
             _espSettings.render();
