@@ -260,7 +260,7 @@ public:
         if(projectileSpeed > 1.0f) {
 
             if(predictBulletDrop && predictMovement) {
-                return AimResolver::calcualteAimRotationNew(cameraPosition, targePosition, Vector3d::zero(), projectileSpeed, projectileDropRate, 255, angle);
+                return AimResolver::calcualteAimRotationNew(cameraPosition, targePosition, targetVelocity, projectileSpeed, projectileDropRate, 255, angle);
             }
             else if (predictBulletDrop) {
                 return AimResolver::calcualteAimRotationNew(cameraPosition, targePosition, Vector3d::zero(), projectileSpeed, projectileDropRate, 255, angle);
