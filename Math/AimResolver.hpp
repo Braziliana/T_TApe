@@ -88,7 +88,7 @@ public:
 
         for(int i = 0; i < steps; i++) {
             Vector3d predictedPosition = getTargetPosition(targetPosition, targetVelocity, time);
-            if(!optimaAngle(start, predictedPosition, bulletSpeed, gravity, angle)){
+            if(!optimalAngle(start, predictedPosition, bulletSpeed, gravity, angle)){
                 
                 continue;
             }
