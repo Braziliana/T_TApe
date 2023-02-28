@@ -23,15 +23,15 @@ public:
 
     ulong region = 0x140000000;
 
-    ulong inAttack = 0x076780e8;
+    ulong inAttack = 0x076782c8; //[Buttons] in_attack=0x076782c8
 
-    ulong level = 0x1462460;
+    ulong level = 0x1462450;//Miscellaneous LevelName=0x1462450
 
-    ulong localPlayer = 0x01ee8b70 + 0x8;
+    ulong localPlayer = 0x01ee8cb0 + 0x8; //0x1388eb8 //.?AVC_GameMovement@@=0x01ee8cb0
 
-    ulong entityList = 0x1b37938; //cl_entitylist=0x1b37938
+    ulong entityList = 0x1b37a78; //cl_entitylist=0x1b37938
 
-    ulong viewRender = 0x7677288; //[Miscellaneous] ViewRender=0x7677288
+    ulong viewRender = 0x7677d20; //[Miscellaneous] ViewRender=0x7677288
     ulong viewMatrix = 0x11a210; //[Miscellaneous] ViewMatrix=0x11a210
 
     ulong lifeState = 0x0798; //m_lifeState=0x0798
@@ -41,7 +41,7 @@ public:
     ulong shield = 0x0170; //[RecvTable.DT_TitanSoul] m_shieldHealth=0x0170
     ulong maxShield = 0x0174; //[RecvTable.DT_TitanSoul] m_shieldHealthMax=0x0174
     ulong lastVisibleTime = 0x1A78;
-    ulong viewAngle = 0x25ac - 0x14;
+    ulong viewAngle = 0x25ac - 0x14; //
     ulong weaponPunch = 0x24b0; //m_currentFrameLocalPlayer.m_vecPunchWeapon_Angle=0x24b0
     ulong breathAngles = 0x0;
     ulong team = 0x044c; //m_iTeamNum=0x044c
@@ -51,8 +51,11 @@ public:
     ulong bones = 0x0e98 + 0x48; //m_bConstrainBetweenEndpoints=0x0f50
     ulong studioHdr = 0x10f0; //CBaseAnimating!m_pStudioHdr=0x10f0
     ulong cameraPosition = 0x1f48; //[Miscellaneous] CPlayer!camera_origin=0x1f48
+    ulong cameraAngles = 0x1f54; //[Miscellaneous] CPlayer!camera_angles=0x1f54
     ulong name = 0x0589; //[RecvTable.DT_BaseEntity] m_iName
     ulong latestPrimaryWeapons = 0x1a1c; //[RecvTable.DT_BaseCombatCharacter] m_latestPrimaryWeapons
+
+
 
     ulong highlightServerContextID = 0x03c0; //[RecvTable.DT_HighlightSettings] m_highlightServerContextID=0x03c0
     ulong glowEnable = 0x008;

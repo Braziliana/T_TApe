@@ -13,7 +13,9 @@ private:
 
     ulong _basePointer;
     bool _isValid;
+    bool _isDead;
     bool _isInAttack;
+    bool _isKnocked;
     int _team;
     Vector3d _position;
     Vector3d _cameraPosition;
@@ -31,6 +33,16 @@ private:
     int readTeam() const {
         ulong ptr = _basePointer + Offsets::getInstance().team;
         return Memory::getInstance().read<int>(ptr);  
+    }
+
+    bool readIsKnocked() const {
+        ulong ptr = _basePointer + Offsets::getInstance().bleedOutState;
+        return Memory::getInstance().read<short>(ptr) > 0;
+    }
+
+    bool readIsDead() {
+        ulong ptr = _basePointer + Offsets::getInstance().lifeState;
+        return Memory::getInstance().read<short>(ptr) > 0;
     }
 
     Vector3d readPosition() const {
@@ -78,6 +90,8 @@ private:
         _position = Vector3d::zero();
         _cameraPosition = Vector3d::zero();
         _isInAttack = false;
+        _isKnocked = false;
+        _isDead = false;
         _team = -1;
         _weaponPunch = QAngle::zero();
         _viewAngle = QAngle::zero();
@@ -102,6 +116,8 @@ public:
         }
 
         _team = readTeam();
+        _isKnocked = readIsKnocked();
+        _isDead = readIsDead();
         _position = readPosition();
         _cameraPosition = readCameraPosition();
         _isInAttack = readIsInAttack();
@@ -117,6 +133,14 @@ public:
 
     bool isValid() const {
         return _isValid;
+    }
+
+    bool isKnocked() const {
+        return _isKnocked;
+    }
+
+    bool isDead() const {
+        return _isDead;
     }
 
     int getTeam() const {
@@ -154,6 +178,19 @@ public:
 
         viewAngle.fixAngle();
         _viewAngle = viewAngle;
+
+        if (_viewAngle.x > 89.0f)
+            return;
+
+        if (_viewAngle.x < -89.0f)
+            return;
+
+        if (_viewAngle.y > 180.f)
+            return;
+
+        if (_viewAngle.y < -180.f)
+            return;
+
         writeViewAngle(viewAngle);
     }
 

@@ -22,11 +22,12 @@ private:
     static const std::string useHotkeyId;
     static const std::string aimHotkeyId;
     static const std::string predictMovementEnabledId;
-    static const std::string predictMovementFactorId;
     static const std::string predictBulletDropEnabledId;
-    static const std::string predictBulletDropFactorId;
-
     static const std::string allowForTargetSwitchId;
+    static const std::string addRandomOffsetEnabledId;
+    static const std::string randomOffsetValueId;
+
+    static const std::string randomWriteDelayValueId;
 
     bool _enabled;
     bool _rage;
@@ -41,10 +42,11 @@ private:
     bool _useHotkey;
     InputKeyType _aimHotkey;
     bool _predictMovementEnabled;
-    float _predictMovementFactor;
     bool _predictBulletDropEnabled;
-    float _predictBulletDropFactor;
     bool _allowForTargetSwitch;
+    bool _addRandomOffsetEnabled;
+    float _randomOffsetValue;
+    float _randomWriteDelayValue;
 
 public:
     AimbotSettings() : _enabled(false),
@@ -60,10 +62,10 @@ public:
         _useHotkey(false),
         _aimHotkey(InputKeyType::MOUSE_X1),
         _predictMovementEnabled(false),
-        _predictMovementFactor(0.75f),
         _predictBulletDropEnabled(false),
-        _predictBulletDropFactor(0.75f),
-        _allowForTargetSwitch(true) {}
+        _allowForTargetSwitch(true),
+        _addRandomOffsetEnabled(true),
+        _randomOffsetValue(0.03f) {}
 
     bool isEnabled() const {
         return _enabled;
@@ -117,20 +119,24 @@ public:
         return _predictMovementEnabled;
     }
 
-    float getPredictMovementFactor() const {
-        return _predictMovementFactor;
-    }
-
     bool predictBulletDropEnabled() const {
         return _predictBulletDropEnabled;
     }
 
-    float getPredictBulletDropFactor() const {
-        return _predictBulletDropFactor;
-    }
-
     bool allowForTargetSwitch() const {
         return _allowForTargetSwitch;
+    }
+
+    bool addRandomOffsetEnabled() const {
+        return _addRandomOffsetEnabled;
+    }
+
+    float getRandomOffsetValue() const {
+        return _randomOffsetValue;
+    }
+
+    float getRandomWriteDelayValue() const {
+        return _randomWriteDelayValue;
     }
 
     void render()  {
@@ -139,32 +145,14 @@ public:
             ImGui::Checkbox("Enabled##Aimbot", &_enabled);
             ImGui::Checkbox("Rage##Aimbot", &_rage);
 
-            Renderer::renderImguiFloatValue("Vertical power", "Aimbot", &_verticalPower, 0.0f, 1.0f, 0.01f, 0.1f);
-            Renderer::renderImguiFloatValue("Horizontal power", "Aimbot", &_horizontalPower, 0.0f, 1.0f, 0.01f, 0.1f);
-            Renderer::renderImguiFloatValue("Speed", "Aimbot", &_speed, 0.0f, 1000.0f, 0.1f, 5.0f);
-            Renderer::renderImguiFloatValue("Max angle change per tick", "Aimbot", &_maxAngleChangePerTick, 0.01f, 10.0f, 0.01f, 0.1f);
-            Renderer::renderImguiFloatValue("Range In Meters", "Aimbot", &_rangeInMeters, 10.0f, 2000.0f, 1.0f, 10.0f);
-            Renderer::renderImguiFloatValue("Field of view", "Aimbot", &_fieldOfView, 1.0f, 360.0f, 1.0f, 5.0f);
+            ImGui::Spacing();
 
             const char* hitboxTypes[] = { "Head", "Neck", "Upper chest", "Lower chest", "Stomach", "Hip" };
             int hitboxTypeIndex = static_cast<int>(_hitbox);
             ImGui::Combo("Hitbox type##Aimbot", &hitboxTypeIndex, hitboxTypes, IM_ARRAYSIZE(hitboxTypes));
             _hitbox = static_cast<HitboxType>(hitboxTypeIndex);
 
-            const char* angleSmoothTypeNames[] = {
-                "Lerp smoothing",
-                "Linear smoothing",
-                "Exponential smoothing",
-                "S-Curve smoothing",
-                "Bezier smoothing",
-                "Acceleration smoothing",
-                "Jerk-Limited smoothing"
-            };
-
-            int angleSmoothTypeIndex = static_cast<int>(_angleSmoothType);
-            if (ImGui::Combo("Angle smooth type##Aimbot", &angleSmoothTypeIndex, angleSmoothTypeNames, IM_ARRAYSIZE(angleSmoothTypeNames))) {
-                _angleSmoothType = static_cast<AngleSmoothType>(angleSmoothTypeIndex);
-            }
+            ImGui::Spacing();
 
             ImGui::Checkbox("Use hotkey##Aimbot", &_useHotkey);
 
@@ -172,14 +160,50 @@ public:
             ImGui::Combo("Aim hotkey##Aimbot", &aimHotkey, InputKeyTypeNames, IM_ARRAYSIZE(InputKeyTypeNames));
             _aimHotkey = static_cast<InputKeyType>(aimHotkey);
 
-            ImGui::Checkbox("Predict movement##Aimbot", &_predictMovementEnabled);
-            Renderer::renderImguiFloatValue("Predict movement factor", "Aimbot", &_predictMovementFactor, 0.1f, 2.0f, 0.05f, 0.1f);
+            if(!_rage)
+            {
+                ImGui::Checkbox("Allow for target switch##Aimbot", &_allowForTargetSwitch);
 
-            ImGui::Checkbox("Predict bullet drop##Aimbot", &_predictBulletDropEnabled);
-            Renderer::renderImguiFloatValue("Predict bullet drop factor", "Aimbot", &_predictBulletDropFactor, 0.1f, 2.0f, 0.05f, 0.1f);
+                Renderer::renderImguiFloatValue("Write delay value", "Aimbot", &_randomWriteDelayValue, 0.0f, 0.5f, 0.001f, 0.01f);
+                ImGui::Spacing();
 
+                Renderer::renderImguiFloatValue("Vertical power", "Aimbot", &_verticalPower, 0.0f, 1.0f, 0.01f, 0.1f);
+                Renderer::renderImguiFloatValue("Horizontal power", "Aimbot", &_horizontalPower, 0.0f, 1.0f, 0.01f, 0.1f);
+                ImGui::Spacing();
 
-            ImGui::Checkbox("Allow for target switch##Aimbot", &_allowForTargetSwitch);
+                Renderer::renderImguiFloatValue("Speed", "Aimbot", &_speed, 0.0f, 1000.0f, 0.1f, 5.0f);
+                Renderer::renderImguiFloatValue("Max angle change per tick", "Aimbot", &_maxAngleChangePerTick, 0.01f, 10.0f, 0.01f, 0.1f);
+                ImGui::Spacing();
+
+                Renderer::renderImguiFloatValue("Range In Meters", "Aimbot", &_rangeInMeters, 10.0f, 2000.0f, 1.0f, 10.0f);
+                Renderer::renderImguiFloatValue("Field of view", "Aimbot", &_fieldOfView, 1.0f, 360.0f, 1.0f, 5.0f);
+                ImGui::Spacing();
+
+                // const char* angleSmoothTypeNames[] = {
+                //     "Lerp smoothing",
+                //     "Linear smoothing",
+                //     "Exponential smoothing",
+                //     "S-Curve smoothing",
+                //     "Bezier smoothing",
+                //     "Acceleration smoothing",
+                //     "Jerk-Limited smoothing"
+                // };
+
+                // int angleSmoothTypeIndex = static_cast<int>(_angleSmoothType);
+                // if (ImGui::Combo("Angle smooth type##Aimbot", &angleSmoothTypeIndex, angleSmoothTypeNames, IM_ARRAYSIZE(angleSmoothTypeNames))) {
+                //     _angleSmoothType = static_cast<AngleSmoothType>(angleSmoothTypeIndex);
+                // }
+
+                ImGui::Checkbox("Predict movement##Aimbot", &_predictMovementEnabled);
+                ImGui::Checkbox("Predict bullet drop##Aimbot", &_predictBulletDropEnabled);
+
+                ImGui::Spacing();
+
+                ImGui::Checkbox("Add random offset to aim angle##Aimbot", &_addRandomOffsetEnabled);
+                if(_addRandomOffsetEnabled) {
+                    Renderer::renderImguiFloatValue("Random offset value", "Aimbot", &_randomOffsetValue, 0.0f, 5.0f, 0.01f, 0.1f);
+                }
+            }
 
             ImGui::EndTabItem();
         }
@@ -250,21 +274,26 @@ public:
             _predictMovementEnabled = true;
         }
 
-        if(!settingsContext.loadFloat(predictMovementFactorId, _predictMovementFactor)) {
-            _predictMovementFactor = 0.75f;
-        }
-
         if(!settingsContext.loadBool(predictBulletDropEnabledId, _predictBulletDropEnabled)) {
             _predictBulletDropEnabled = false;
-        }
-
-        if(!settingsContext.loadFloat(predictBulletDropFactorId, _predictBulletDropFactor)) {
-            _predictBulletDropFactor = 0.75f;
         }
 
         if(!settingsContext.loadBool(allowForTargetSwitchId, _allowForTargetSwitch)) {
             _allowForTargetSwitch = false;
         }
+
+        if(!settingsContext.loadBool(addRandomOffsetEnabledId, _addRandomOffsetEnabled)) {
+            _addRandomOffsetEnabled = false;
+        }
+
+        if(!settingsContext.loadFloat(randomOffsetValueId, _randomOffsetValue)) {
+            _randomOffsetValue = 0.03f;
+        }
+
+        if(!settingsContext.loadFloat(randomWriteDelayValueId, _randomWriteDelayValue)) {
+            _randomWriteDelayValue = 0.00f;
+        }
+
     }
 
     void save(SettingsContext& settingsContext) const {
@@ -281,10 +310,11 @@ public:
         settingsContext.set(useHotkeyId, _useHotkey);
         settingsContext.set(aimHotkeyId, static_cast<int>(_aimHotkey));
         settingsContext.set(predictMovementEnabledId, _predictMovementEnabled);
-        settingsContext.set(predictMovementFactorId, _predictMovementFactor);
         settingsContext.set(predictBulletDropEnabledId, _predictBulletDropEnabled);
-        settingsContext.set(predictBulletDropFactorId, _predictBulletDropFactor);
         settingsContext.set(allowForTargetSwitchId, _allowForTargetSwitch);
+        settingsContext.set(addRandomOffsetEnabledId, _addRandomOffsetEnabled);
+        settingsContext.set(randomOffsetValueId, _randomOffsetValue);
+        settingsContext.set(randomWriteDelayValueId, _randomWriteDelayValue);
     }
 };
 
@@ -301,7 +331,8 @@ const std::string AimbotSettings::angleSmoothTypeId = "aimbot.angleSmoothType";
 const std::string AimbotSettings::useHotkeyId = "aimbot.useHotkey";
 const std::string AimbotSettings::aimHotkeyId = "aimbot.aimHotkey";
 const std::string AimbotSettings::predictMovementEnabledId = "aimbot.predictMovementEnabled";
-const std::string AimbotSettings::predictMovementFactorId = "aimbot.predictMovementFactor";
 const std::string AimbotSettings::predictBulletDropEnabledId = "aimbot.predictBulletDropEnabled";
-const std::string AimbotSettings::predictBulletDropFactorId = "aimbot.predictBulletDropFactor";
 const std::string AimbotSettings::allowForTargetSwitchId = "aimbot.allowForTargetSwitch";
+const std::string AimbotSettings::addRandomOffsetEnabledId = "aimbot.addRandomOffsetEnabled";
+const std::string AimbotSettings::randomOffsetValueId = "aimbot.randomOffsetValue";
+const std::string AimbotSettings::randomWriteDelayValueId = "aimbot.randomWriteDelayValue";

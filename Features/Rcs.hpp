@@ -32,6 +32,12 @@ public:
     Rcs& operator=(const Rcs&) = delete;
 
     void update() {
+
+        if(!LocalPlayer::getInstance().isValid() || LocalPlayer::getInstance().isKnocked() || LocalPlayer::getInstance().isDead()) {
+            _previousPunch = QAngle(0, 0);
+            return;
+        }
+
         const RcsSettings& settings = Settings::getInstance().getRcsSettings();
         QAngle weponPunch = LocalPlayer::getInstance().getWeaponPunch();
 

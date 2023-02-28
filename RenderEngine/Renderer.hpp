@@ -44,7 +44,7 @@ public:
     }
 
     static bool renderImguiFloatValue(std::string label, std::string id, float* value, float min, float max, float slowStep, float fastStep) {
-        const char* format = "%.2f";
+        const char* format = "%.3f";
         
         std::string labelId = label + "##" + id;
         bool sliderResult = ImGui::SliderFloat(labelId.c_str(), value, min, max, format);

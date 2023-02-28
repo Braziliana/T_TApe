@@ -82,6 +82,11 @@ public:
     void update() {
         const EspSettings& settings = Settings::getInstance().getEspSettings();
 
+        if(!LocalPlayer::getInstance().isValid() || LocalPlayer::getInstance().isKnocked() || LocalPlayer::getInstance().isDead()) {
+            _lastUpdate = 0;
+            return;
+        }
+
         if(!settings.isGlowEnabled() || _lastUpdate + 0.1f > TimeManager::getInstance().getTime()){
             return;
         }

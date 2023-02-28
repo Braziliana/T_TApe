@@ -23,7 +23,7 @@ public:
     FeaturesManager& operator=(const FeaturesManager&) = delete;
 
     void update() {
-        if(!LocalPlayer::getInstance().isValid()) {
+        if(!LocalPlayer::getInstance().isValid() || LocalPlayer::getInstance().isDead()) {
             return;
         }
         
@@ -33,7 +33,7 @@ public:
     }
 
     void render() {
-        if(!LocalPlayer::getInstance().isValid()) {
+        if(!LocalPlayer::getInstance().isValid() || LocalPlayer::getInstance().isDead()) {
             return;
         }
 

@@ -423,4 +423,30 @@ public:
         Memory::getInstance().write(ptr, glowMode);
         _glowMode = glowMode;
     }
+
+    static std::string getClientClassName(int index) {
+        ulong entity_ptr = Offsets::getInstance().region + Offsets::getInstance().entityList + ((index + 1) << 5);
+        entity_ptr = Memory::getInstance().read<ulong>(entity_ptr);
+        if(!Memory::isValidPointer(entity_ptr)){
+            return "";
+        }
+        long client_networkable_vtable;
+        long get_client_entity;
+        int offset;
+        long network_name_ptr;
+        char buffer[32];
+
+        try {
+        // Read the ClientClass's network name for to given entity
+        client_networkable_vtable = Memory::getInstance().read<long>(entity_ptr + 3 * 8);
+        get_client_entity = Memory::getInstance().read<long>(client_networkable_vtable + 3 * 8);
+        offset = Memory::getInstance().read<long>(get_client_entity + 3);
+        network_name_ptr = Memory::getInstance().read<long>(get_client_entity + offset + 7 + 16);
+        
+        return Memory::getInstance().readString(network_name_ptr, 32);
+        }
+        catch(...){
+            return "";
+        }
+    }
 };
