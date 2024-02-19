@@ -6,6 +6,45 @@
 <br />
 <br />
 
+## Instalation script
+```bash
+#!/bin/bash
+
+# Update package lists
+sudo apt update
+
+# Install required packages
+sudo apt install -y libudev-dev xorg-dev libglu1-mesa-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxkbcommon-dev libwayland-dev git cmake g++ gcc libinput-dev libsoil-dev nlohmann-json3-dev
+
+
+# Clone GLFW from GitHub
+git clone https://github.com/glfw/glfw.git
+
+# Navigate to the GLFW directory
+cd glfw
+
+# Create build directory
+mkdir build
+
+# Navigate to the build directory
+cd build
+
+# Run CMake
+cmake ..
+
+# Build GLFW
+make
+
+# Install GLFW
+sudo make install
+
+# Navigate back to the parent directory
+cd ../..
+
+# Remove the GLFW directory
+rm -rf glfw
+```
+
 ## 1. Install Cinnamon desktop environment on Ubuntu
 ```bash
 sudo apt update

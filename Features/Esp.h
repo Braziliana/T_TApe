@@ -140,7 +140,8 @@ namespace Features
             Math::Vector2D(150, 10),
             shiledColor,
             static_cast<float>(player->GetShield())/player->GetMaxShield(),
-            segments);
+            segments,
+            5);
 
         auto healthPercent = static_cast<float>(player->GetHealth())/player->GetMaxHealth();
         //auto healthColor = Math::Color(0.0f, 1.0f, 0.0f);

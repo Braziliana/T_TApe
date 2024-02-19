@@ -66,7 +66,7 @@ public:
             2);
     }
 
-    static void drawSheildBar(Math::Vector2D position, Math::Vector2D size, Math::Color color, float fill, int segments){
+    static void drawSheildBar(Math::Vector2D position, Math::Vector2D size, Math::Color color, float fill, int segments, int maxSegments){
 
         ImVec2 startPosition = ImVec2(position.x - size.x/2, position.y);
         ImGui::GetWindowDrawList()->AddRectFilled(
