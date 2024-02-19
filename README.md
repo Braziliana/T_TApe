@@ -6,7 +6,7 @@
 <br />
 <br />
 
-## Instalation script
+## Dependency instalation script
 ```bash
 #!/bin/bash
 
