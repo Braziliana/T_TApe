@@ -68,15 +68,15 @@ public:
 
     static void drawSheildBar(Math::Vector2D position, Math::Vector2D size, Math::Color color, float fill, int segments, int maxSegments){
 
+        auto segmentSize = size.x/maxSegments;
+        auto width = segmentSize*segments;
         ImVec2 startPosition = ImVec2(position.x - size.x/2, position.y);
         ImGui::GetWindowDrawList()->AddRectFilled(
             ImVec2(startPosition.x, position.y),
-            ImVec2(startPosition.x + size.x*fill, position.y + size.y),
+            ImVec2(startPosition.x + width*fill, position.y + size.y),
             ImColor(color.r, color.g, color.b, 1.0f));
 
-        auto segmentSize = size.x/segments;
-
-        for(auto i=0; i<segments; i++) 
+        for(auto i=0; i<maxSegments; i++) 
         {
             auto x = startPosition.x + i*segmentSize;
             ImGui::GetWindowDrawList()->AddRect(
