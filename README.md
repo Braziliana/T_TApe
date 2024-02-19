@@ -119,11 +119,8 @@ cmake ..
 make
 ```
 ```bash
-sudo ./T_TApe
+sudo sudo ./Apex
 ```
-### or u can use script 
-* BuildAndRun.sh - to build and run
-* Run.sh - to run
 
 ## 7. Menu key
 * Insert
