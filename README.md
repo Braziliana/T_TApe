@@ -63,10 +63,7 @@ select cinnamon when you log in
 sudo apt update
 ```
 ```bash
-sudo apt-get install -y libudev-dev
-```
-```bash
-sudo apt install cmake xorg-dev libglu1-mesa-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
+sudo apt install -y libudev-dev xorg-dev libglu1-mesa-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxkbcommon-dev libwayland-dev git cmake g++ gcc libinput-dev libsoil-dev nlohmann-json3-dev
 ```
 
 ## 3. remove from /usr/lib/x86_64-linux-gnu/ files starting with libglfw you can run command below. If u get error u can mannualy check if files with name starting with libglfw if not you can go to next step
