@@ -45,6 +45,7 @@ namespace Features {
             ImGuiIO& io = ImGui::GetIO();
             logoFont = io.Fonts->AddFontFromFileTTF("Assets/Roboto-Bold.ttf", 30);
             LoadConfigs();
+            LoadDefaultConfig();
         }
         ~Settings() = default;
 
@@ -173,6 +174,26 @@ namespace Features {
             }
         }
 
+        void LoadDefaultConfig(){
+            std::ifstream file("config.json");
+            if (file.is_open()) {
+                json j;
+                file >> j;
+                file.close();
+                std::string configNameStr = j["configName"];
+                strcpy(configName, configNameStr.c_str());
+                LoadConfig();
+            }
+        }
+
+        void SaveDefaultConfig(){
+            json j = {{"configName", configName}};
+            std::ofstream file("config.json");
+            file << std::setw(4) << j.dump(4) << std::endl;
+            file.close();
+            LoadConfigs();
+        }
+
         std::vector<std::string> jsonFiles;
         void LoadConfigs(){
             std::string configDirectory = "Configs";
@@ -184,6 +205,16 @@ namespace Features {
             }
         }
 
+        void LoadConfig(){
+                std::string configFile = "Configs/" + std::string(configName) + ".json";
+                std::ifstream file(configFile);
+                if (file.is_open()) {
+                    json j;
+                    file >> j;
+                    file.close();
+                    Load(j);
+                }
+        }
 
         char configName[64] = {0};
         int selectedConfig = 0;
@@ -204,14 +235,8 @@ namespace Features {
             ImGui::SameLine();
             
             if(ImGui::Button("Load")){
-                std::string configFile = "Configs/" + std::string(configName) + ".json";
-                std::ifstream file(configFile);
-                if (file.is_open()) {
-                    json j;
-                    file >> j;
-                    file.close();
-                    Load(j);
-                }
+                LoadConfig();
+                SaveDefaultConfig();
             }
 
             ImGui::BeginListBox("##Configs");
