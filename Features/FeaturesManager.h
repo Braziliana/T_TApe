@@ -71,10 +71,15 @@ namespace Features
 
             auto aimbotRun = false;
             auto aimbotSettings = Settings::getInstance().GetAimbotSettings();
-            if(gameContext->IsButtonDown(aimbotSettings->GetAimbotKey())){
+
+            //!InputManager::isKeyDownOrPress(settings.getAimHotkey())
+            //if(gameContext->IsButtonDown(aimbotSettings->GetAimbotKey())){
+            if(InputManager::isKeyDownOrPress(static_cast<InputKeyType>(aimbotSettings->GetAimbotKey())))
+            {
                 aimbotRun = aimbot.Update(gameContext, timer);
             }
-            else {
+            else 
+            {
                 aimbot.ResetValues();
             }
 

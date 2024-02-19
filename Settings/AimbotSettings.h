@@ -45,114 +45,114 @@ public:
     AimbotSettings()
     {
         enabled = true;
-        fov = 25.0f;
+        fov = 250.0f;
         ignoreFovCheckDistance = 10.0f;
         distance = 250.0f;
         hitbox = SDK::HitboxType::UpperChest;
 
         rcsEnabled = true;
-        rcsPitchPower = 0.7f;
-        rcsYawPower = 0.7f;
+        rcsPitchPower = 0.5f;
+        rcsYawPower = 0.5f;
 
-        aimbotKey = (int)SDK::ButtonType::MOUSE_5;
+        aimbotKey = (int)InputKeyType::MOUSE_X1;
 
         smoothEnabled = false;
-        smoofing = 5.0f;
+        smoofing = 15.0f;
         smoofingMinSpeed = 5.0f;
-        smoofingMaxSpeed = 15.0f;
+        smoofingMaxSpeed = 20.0f;
 
-        predictionEnabled = false;
+        predictionEnabled = true;
 
         singleTargetPerAimUse = false;
         switchTargetDelay = 0.0f;
 
-        aimAssist = false;
-        aimTime = 0.5f;
-        aimBreak = 0.5f;
+        aimAssist = true;
+        aimTime = 0.03f;
+        aimBreak = 0.05f;
 
         aimActiveOnlyWhenShooting = false;
     }
 
     
-		inline bool IsEnabled() const {
-			return enabled;
-		}
+    inline bool IsEnabled() const {
+        return enabled;
+    }
 
-		inline float GetFov() const {
-			return fov;
-		}
+    inline float GetFov() const {
+        return fov;
+    }
 
-		inline float GetIgnoreFovCheckDistance() const {
-			return ignoreFovCheckDistance;
-		}
+    inline float GetIgnoreFovCheckDistance() const {
+        return ignoreFovCheckDistance;
+    }
 
-		inline float GetDistance() const {
-			return distance;
-		}
+    inline float GetDistance() const {
+        return distance;
+    }
 
-		inline SDK::HitboxType GetHitbox() const {
-			return hitbox;
-		}
+    inline SDK::HitboxType GetHitbox() const {
+        return hitbox;
+    }
 
-		inline bool IsRcsEnabled() const {
-			return rcsEnabled;
-		}
+    inline bool IsRcsEnabled() const {
+        return rcsEnabled;
+    }
 
-		inline float GetRCSPitchPower() const {
-			return rcsPitchPower;
-		}
+    inline float GetRCSPitchPower() const {
+        return rcsPitchPower;
+    }
 
-		inline float GetRCSYawPower() const {
-			return rcsYawPower;
-		}
+    inline float GetRCSYawPower() const {
+        return rcsYawPower;
+    }
 
-		inline int GetAimbotKey() const {
-			return aimbotKey;
-		}
+    inline int GetAimbotKey() const {
+        return aimbotKey;
+    }
 
-		inline bool IsSmoothEnabled() const {
-			return smoothEnabled;
-		}
+    inline bool IsSmoothEnabled() const {
+        return smoothEnabled;
+    }
 
-		inline float GetSmoofing() const {
-			return smoofing;
-		}
+    inline float GetSmoofing() const {
+        return smoofing;
+    }
 
-		inline float GetSmoofingMinSpeed() const {
-			return smoofingMinSpeed;
-		}
+    inline float GetSmoofingMinSpeed() const {
+        return smoofingMinSpeed;
+    }
 
-		inline float GetSmoofingMaxSpeed() const {
-			return smoofingMaxSpeed;
-		}
+    inline float GetSmoofingMaxSpeed() const {
+        return smoofingMaxSpeed;
+    }
 
-		inline bool IsPredictionEnabled() const {
-			return predictionEnabled;
-		}
+    inline bool IsPredictionEnabled() const {
+        return predictionEnabled;
+    }
 
-		inline bool IsSingleTargetPerAimUse() const {
-			return singleTargetPerAimUse;
-		}
+    inline bool IsSingleTargetPerAimUse() const {
+        return singleTargetPerAimUse;
+    }
 
-		inline float GetswitchTargetDelay() const {
-			return switchTargetDelay;
-		}
+    inline float GetswitchTargetDelay() const {
+        return switchTargetDelay;
+    }
 
-		inline bool IsAimAssistEnabled() const {
-			return aimAssist;
-		}
+    inline bool IsAimAssistEnabled() const {
+        return aimAssist;
+    }
 
-		inline float GetAimTime() const {
-			return aimTime;
-		}
+    inline float GetAimTime() const {
+        return aimTime;
+    }
 
-		inline float GetAimBreak() const {
-			return aimBreak;
-		}
+    inline float GetAimBreak() const {
+        return aimBreak;
+    }
 
-		inline bool IsAimActiveOnlyWhenShooting() const {
-			return aimActiveOnlyWhenShooting;
-		}
+    inline bool IsAimActiveOnlyWhenShooting() const {
+        return aimActiveOnlyWhenShooting;
+    }
 
     void Render() {
 
@@ -166,9 +166,7 @@ public:
         ImGui::Checkbox("Single target per use##Aimbot", &singleTargetPerAimUse);
         Renderer::renderImguiFloatValue("Switch target delay", "Aimbot", &switchTargetDelay, 0.0f, 2.0f, 0.01f, 0.1f);
 
-        //            int aimHotkey = static_cast<int>(aimHotkey);
-        //            ImGui::Combo("Aim hotkey##Aimbot", &aimHotkey, InputKeyTypeNames, IM_ARRAYSIZE(InputKeyTypeNames));
-        //            aimHotkey = static_cast<InputKeyType>(aimHotkey);
+        ImGui::Combo("Aim hotkey##Aimbot", &aimbotKey, InputKeyTypeNames, IM_ARRAYSIZE(InputKeyTypeNames));
 
         int hitboxId = static_cast<int>(hitbox);
 

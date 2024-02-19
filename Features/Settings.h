@@ -234,7 +234,8 @@ namespace Features {
                 return;
             }
 
-            ImGui::Begin("Settings");
+            ImGui::SetNextWindowSize(ImVec2(960, 620));
+            ImGui::Begin("Settings", &_isOpen, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
             
             ImGui::Columns(2, nullptr, false);
             ImGui::SetColumnOffset(1, 220);

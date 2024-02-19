@@ -30,10 +30,14 @@ private:
     pid_t getPID() {
         char buf[512];
         FILE *cmd_pipe = popen("pidof -s r5apex.exe", "r");
-        fgets(buf, 512, cmd_pipe);
+        if(fgets(buf, 512, cmd_pipe) == nullptr)
+        {
+            pclose(cmd_pipe);
+            return 0;
+        }
+
         pid_t pid = strtoul(buf, NULL, 10);
         pclose(cmd_pipe);
-
         return pid;
     }
 
