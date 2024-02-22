@@ -53,10 +53,10 @@ SDK::GameContext* gameContext;
 Timer timer;
 bool update() {
     try {
-        if(gameContext == nullptr || !gameContext->Update()){
+        timer.Update();
+        if(gameContext == nullptr || !gameContext->Update(&timer)){
             return true;
         }
-        timer.Update();
         Features::FeaturesManager::getInstance().Update(gameContext, &timer);
 
         return true;

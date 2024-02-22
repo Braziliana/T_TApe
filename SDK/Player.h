@@ -15,6 +15,7 @@
 #include "HitboxType.h"
 
 #include "../Misc/Logger.h"
+#include "../Misc/Timer.h"
 
 namespace SDK
 {
@@ -49,6 +50,8 @@ namespace SDK
         int lowerChestBone = -1;
         int stomachBone = -1;
         int hipBone = -1;
+
+        float lastVisiblityCheck = -1;
 
         template <typename T>
         inline bool ReadOffset(uintptr_t offset, T* value) const
@@ -104,7 +107,7 @@ namespace SDK
             vecAbsVelocity = Math::Vector3D(0, 0, 0);
         }
 
-        bool Update(int entityIndex)
+        bool Update(int entityIndex, PTimer timer)
         {
             if (!ReadBasePointer(entityIndex)) {
                 Reset();
@@ -177,13 +180,24 @@ namespace SDK
             isAimedAt = lastTimeAimedAtPrevious < lastTimeAimedAt;
             lastTimeAimedAtPrevious = lastTimeAimedAt;
 
-            if (!ReadOffset(OFF_LAST_VISIBLE_TIME, &lastTimeVisible)) {
-                return false;
+            if(lastVisiblityCheck < 0 || lastVisiblityCheck + 0.005f < timer->Time())
+            {
+                if (!ReadOffset(OFF_LAST_VISIBLE_TIME, &lastTimeVisible)) {
+                    return false;
+                }
+                visible = isAimedAt || lastTimeVisiblePrev < lastTimeVisible;
+                lastTimeVisiblePrev = lastTimeVisible;
             }
-            visible = isAimedAt || lastTimeVisiblePrev < lastTimeVisible;
-            lastTimeVisiblePrev = lastTimeVisible;
+            else
+            {
+                visible = visible || isAimedAt;
+            }
 
             return true;
+        }
+
+        inline int GetIndex() const {
+            return index;
         }
 
         inline bool IsDead() const {

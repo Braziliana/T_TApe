@@ -34,6 +34,7 @@ namespace Features
 	private:
 		Math::Vector2D rcsMouseMove;
 		SDK::PPlayer currentTarget;
+		int targetId=-1;
 
 		bool canGetNextTarget;
 		float lostTarget;
@@ -56,6 +57,8 @@ namespace Features
 			lostTarget = -9999;
 			aimState = AimState::Idle;
 			aimTimer = -9999;
+			currentTarget = nullptr;
+			targetId=-1;
 			Reset();
 		}
 
@@ -70,7 +73,7 @@ namespace Features
 
 			auto target = SelectTarget(gameContext);
 
-            if(currentTarget != target){
+            if(target != nullptr && targetId != target->GetIndex()){
                 if (!canGetNextTarget || lostTarget + aimbotSettings->GetswitchTargetDelay() > timer->Time()) {
 
                     return nullptr;
@@ -80,6 +83,7 @@ namespace Features
 			lostTarget = timer->Time();
 			if (target != nullptr) {
 				canGetNextTarget = !aimbotSettings->IsSingleTargetPerAimUse();
+				targetId = target->GetIndex();
 			}
 			else {
 				lostTarget = timer->Time();

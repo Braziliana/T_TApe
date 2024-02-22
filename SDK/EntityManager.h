@@ -7,6 +7,7 @@
 
 #include "Player.h"
 #include "LocalPlayer.h"
+#include "../Misc/Timer.h"
 
 namespace SDK
 {
@@ -26,11 +27,11 @@ namespace SDK
             }
         }
 
-        bool Update()
+        bool Update(PTimer timer)
         {
             for (auto i = 0; i < maxPlayers; i++)
             {
-                players[i].Update(i);
+                players[i].Update(i, timer);
             }
 
             return true;

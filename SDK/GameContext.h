@@ -6,6 +6,7 @@
 #define APEX_GAMECONTEXT_H
 
 #include "../Misc/Memory.h"
+#include "../Misc/Timer.h"
 
 #include "Offsets.h"
 #include "GameLevel.h"
@@ -58,7 +59,7 @@ namespace SDK
             entityManager = EntityManager();
         }
 
-        bool Update()
+        bool Update(PTimer timer)
         {
             if (!gameLevel.Update()) {
                 //Logger::log("Failed update gamecontext gameLevel");
@@ -84,7 +85,7 @@ namespace SDK
                 return false;
             }
 
-            if (!entityManager.Update()) {
+            if (!entityManager.Update(timer)) {
                 //Logger::log("Failed update gamecontext entityManager");
                 return false;
             }
